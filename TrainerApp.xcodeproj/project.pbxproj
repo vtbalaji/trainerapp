@@ -1,0 +1,500 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A1000001 /* TrainerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000001 /* TrainerApp.swift */; };
+		A1000002 /* ScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000002 /* ScanView.swift */; };
+		A1000003 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000003 /* DashboardView.swift */; };
+		A1000004 /* BluetoothManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000004 /* BluetoothManager.swift */; };
+		A1000005 /* TrainerData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000005 /* TrainerData.swift */; };
+		A1000006 /* FTMSConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000006 /* FTMSConstants.swift */; };
+		A1000007 /* TrainerProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000007 /* TrainerProtocol.swift */; };
+		A1000008 /* FTMSTrainerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000008 /* FTMSTrainerService.swift */; };
+		A1000009 /* SavedTrainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000009 /* SavedTrainer.swift */; };
+		A1000010 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000010 /* SettingsView.swift */; };
+		A1000011 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B1000011 /* Assets.xcassets */; };
+		A1000014 /* AppIcon60x60@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B1000014; };
+		A1000015 /* AppIcon60x60@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = B1000015; };
+		A1000016 /* AppIcon76x76@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B1000016; };
+		A1000017 /* AppIcon83.5x83.5@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B1000017; };
+		A1000018 /* AppIcon-20@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B1000018; };
+		A1000019 /* AppIcon-20@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = B1000019; };
+		A1000020 /* AppIcon-29@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B1000020; };
+		A1000021 /* AppIcon-29@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = B1000021; };
+		A1000022 /* AppIcon-40@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B1000022; };
+		A1000023 /* AppIcon-40@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = B1000023; };
+		A1000012 /* TacxFECTrainerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000012 /* TacxFECTrainerService.swift */; };
+		A1000013 /* ControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000013 /* ControlView.swift */; };
+		A1000024 /* WorkoutPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000024 /* WorkoutPlan.swift */; };
+		A1000025 /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000025 /* UserSettings.swift */; };
+		A1000026 /* WorkoutsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000026 /* WorkoutsView.swift */; };
+		A1000027 /* endurance_1hr.zwo in Resources */ = {isa = PBXBuildFile; fileRef = B1000027 /* endurance_1hr.zwo */; };
+		A1000028 /* sweet_spot_3x10.zwo in Resources */ = {isa = PBXBuildFile; fileRef = B1000028 /* sweet_spot_3x10.zwo */; };
+		A1000029 /* vo2max_5x3.zwo in Resources */ = {isa = PBXBuildFile; fileRef = B1000029 /* vo2max_5x3.zwo */; };
+		A1000030 /* threshold_2x20.zwo in Resources */ = {isa = PBXBuildFile; fileRef = B1000030 /* threshold_2x20.zwo */; };
+		A1000031 /* recovery_30min.zwo in Resources */ = {isa = PBXBuildFile; fileRef = B1000031 /* recovery_30min.zwo */; };
+		A1000037 /* ftp_test_20min.zwo in Resources */ = {isa = PBXBuildFile; fileRef = B1000037 /* ftp_test_20min.zwo */; };
+		A1000038 /* over_unders_3x12.zwo in Resources */ = {isa = PBXBuildFile; fileRef = B1000038 /* over_unders_3x12.zwo */; };
+		A1000039 /* tabata_intervals.zwo in Resources */ = {isa = PBXBuildFile; fileRef = B1000039 /* tabata_intervals.zwo */; };
+		A1000040 /* tempo_45min.zwo in Resources */ = {isa = PBXBuildFile; fileRef = B1000040 /* tempo_45min.zwo */; };
+		A1000041 /* microbursts_15x15.zwo in Resources */ = {isa = PBXBuildFile; fileRef = B1000041 /* microbursts_15x15.zwo */; };
+		A1000042 /* sprint_power_6x30.zwo in Resources */ = {isa = PBXBuildFile; fileRef = B1000042 /* sprint_power_6x30.zwo */; };
+		A1000043 /* pyramid_intervals.zwo in Resources */ = {isa = PBXBuildFile; fileRef = B1000043 /* pyramid_intervals.zwo */; };
+		A1000044 /* endurance_90min.zwo in Resources */ = {isa = PBXBuildFile; fileRef = B1000044 /* endurance_90min.zwo */; };
+		A1000045 /* race_simulation.zwo in Resources */ = {isa = PBXBuildFile; fileRef = B1000045 /* race_simulation.zwo */; };
+		A1000046 /* sweetspot_2x30.zwo in Resources */ = {isa = PBXBuildFile; fileRef = B1000046 /* sweetspot_2x30.zwo */; };
+		A1000032 /* WorkoutExecutionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000032 /* WorkoutExecutionView.swift */; };
+		A1000033 /* WorkoutSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000033 /* WorkoutSession.swift */; };
+		A1000034 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000034 /* HistoryView.swift */; };
+		A1000035 /* StravaService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000035 /* StravaService.swift */; };
+		A1000036 /* StravaAuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000036 /* StravaAuthView.swift */; };
+		A1000047 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000047 /* Config.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		B1000001 /* TrainerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainerApp.swift; sourceTree = "<group>"; };
+		B1000002 /* ScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanView.swift; sourceTree = "<group>"; };
+		B1000003 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		B1000004 /* BluetoothManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothManager.swift; sourceTree = "<group>"; };
+		B1000005 /* TrainerData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainerData.swift; sourceTree = "<group>"; };
+		B1000006 /* FTMSConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FTMSConstants.swift; sourceTree = "<group>"; };
+		B1000007 /* TrainerProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainerProtocol.swift; sourceTree = "<group>"; };
+		B1000008 /* FTMSTrainerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FTMSTrainerService.swift; sourceTree = "<group>"; };
+		B1000009 /* SavedTrainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedTrainer.swift; sourceTree = "<group>"; };
+		B1000010 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		B1000011 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B1000012 /* TacxFECTrainerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TacxFECTrainerService.swift; sourceTree = "<group>"; };
+		B1000013 /* ControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlView.swift; sourceTree = "<group>"; };
+		B1000014 /* AppIcon60x60@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon60x60@2x.png"; sourceTree = "<group>"; };
+		B1000015 /* AppIcon60x60@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon60x60@3x.png"; sourceTree = "<group>"; };
+		B1000016 /* AppIcon76x76@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon76x76@2x.png"; sourceTree = "<group>"; };
+		B1000017 /* AppIcon83.5x83.5@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon83.5x83.5@2x.png"; sourceTree = "<group>"; };
+		B1000018 /* AppIcon-20@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-20@2x.png"; sourceTree = "<group>"; };
+		B1000019 /* AppIcon-20@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-20@3x.png"; sourceTree = "<group>"; };
+		B1000020 /* AppIcon-29@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-29@2x.png"; sourceTree = "<group>"; };
+		B1000021 /* AppIcon-29@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-29@3x.png"; sourceTree = "<group>"; };
+		B1000022 /* AppIcon-40@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-40@2x.png"; sourceTree = "<group>"; };
+		B1000023 /* AppIcon-40@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-40@3x.png"; sourceTree = "<group>"; };
+		C1000001 /* TrainerApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrainerApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B1000024 /* WorkoutPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutPlan.swift; sourceTree = "<group>"; };
+		B1000025 /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
+		B1000026 /* WorkoutsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutsView.swift; sourceTree = "<group>"; };
+		B1000027 /* endurance_1hr.zwo */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = endurance_1hr.zwo; sourceTree = "<group>"; };
+		B1000028 /* sweet_spot_3x10.zwo */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = sweet_spot_3x10.zwo; sourceTree = "<group>"; };
+		B1000029 /* vo2max_5x3.zwo */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = vo2max_5x3.zwo; sourceTree = "<group>"; };
+		B1000030 /* threshold_2x20.zwo */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = threshold_2x20.zwo; sourceTree = "<group>"; };
+		B1000031 /* recovery_30min.zwo */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = recovery_30min.zwo; sourceTree = "<group>"; };
+		B1000037 /* ftp_test_20min.zwo */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ftp_test_20min.zwo; sourceTree = "<group>"; };
+		B1000038 /* over_unders_3x12.zwo */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = over_unders_3x12.zwo; sourceTree = "<group>"; };
+		B1000039 /* tabata_intervals.zwo */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = tabata_intervals.zwo; sourceTree = "<group>"; };
+		B1000040 /* tempo_45min.zwo */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = tempo_45min.zwo; sourceTree = "<group>"; };
+		B1000041 /* microbursts_15x15.zwo */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = microbursts_15x15.zwo; sourceTree = "<group>"; };
+		B1000042 /* sprint_power_6x30.zwo */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = sprint_power_6x30.zwo; sourceTree = "<group>"; };
+		B1000043 /* pyramid_intervals.zwo */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = pyramid_intervals.zwo; sourceTree = "<group>"; };
+		B1000044 /* endurance_90min.zwo */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = endurance_90min.zwo; sourceTree = "<group>"; };
+		B1000045 /* race_simulation.zwo */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = race_simulation.zwo; sourceTree = "<group>"; };
+		B1000046 /* sweetspot_2x30.zwo */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = sweetspot_2x30.zwo; sourceTree = "<group>"; };
+		B1000047 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
+		B1000032 /* WorkoutExecutionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutExecutionView.swift; sourceTree = "<group>"; };
+		B1000033 /* WorkoutSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSession.swift; sourceTree = "<group>"; };
+		B1000034 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		B1000035 /* StravaService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StravaService.swift; sourceTree = "<group>"; };
+		B1000036 /* StravaAuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StravaAuthView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D1000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		E1000001 = {
+			isa = PBXGroup;
+			children = (
+				E1000002 /* TrainerApp */,
+				E1000007 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		E1000002 /* TrainerApp */ = {
+			isa = PBXGroup;
+			children = (
+				B1000001 /* TrainerApp.swift */,
+				B1000047 /* Config.swift */,
+				B1000011 /* Assets.xcassets */,
+				B1000014 /* AppIcon60x60@2x.png */,
+				B1000015 /* AppIcon60x60@3x.png */,
+				B1000016 /* AppIcon76x76@2x.png */,
+				B1000017 /* AppIcon83.5x83.5@2x.png */,
+				B1000018 /* AppIcon-20@2x.png */,
+				B1000019 /* AppIcon-20@3x.png */,
+				B1000020 /* AppIcon-29@2x.png */,
+				B1000021 /* AppIcon-29@3x.png */,
+				B1000022 /* AppIcon-40@2x.png */,
+				B1000023 /* AppIcon-40@3x.png */,
+				E1000003 /* Models */,
+				E1000004 /* Services */,
+				E1000005 /* Views */,
+				E1000006 /* Utilities */,
+				E1000008 /* Workouts */,
+			);
+			path = TrainerApp;
+			sourceTree = "<group>";
+		};
+		E1000008 /* Workouts */ = {
+			isa = PBXGroup;
+			children = (
+				B1000027 /* endurance_1hr.zwo */,
+				B1000028 /* sweet_spot_3x10.zwo */,
+				B1000029 /* vo2max_5x3.zwo */,
+				B1000030 /* threshold_2x20.zwo */,
+				B1000031 /* recovery_30min.zwo */,
+				B1000037 /* ftp_test_20min.zwo */,
+				B1000038 /* over_unders_3x12.zwo */,
+				B1000039 /* tabata_intervals.zwo */,
+				B1000040 /* tempo_45min.zwo */,
+				B1000041 /* microbursts_15x15.zwo */,
+				B1000042 /* sprint_power_6x30.zwo */,
+				B1000043 /* pyramid_intervals.zwo */,
+				B1000044 /* endurance_90min.zwo */,
+				B1000045 /* race_simulation.zwo */,
+				B1000046 /* sweetspot_2x30.zwo */,
+			);
+			path = Workouts;
+			sourceTree = "<group>";
+		};
+		E1000003 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B1000005 /* TrainerData.swift */,
+				B1000009 /* SavedTrainer.swift */,
+				B1000024 /* WorkoutPlan.swift */,
+				B1000025 /* UserSettings.swift */,
+				B1000033 /* WorkoutSession.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		E1000004 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				B1000004 /* BluetoothManager.swift */,
+				B1000007 /* TrainerProtocol.swift */,
+				B1000008 /* FTMSTrainerService.swift */,
+				B1000012 /* TacxFECTrainerService.swift */,
+				B1000035 /* StravaService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		E1000005 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				B1000002 /* ScanView.swift */,
+				B1000003 /* DashboardView.swift */,
+				B1000010 /* SettingsView.swift */,
+				B1000013 /* ControlView.swift */,
+				B1000026 /* WorkoutsView.swift */,
+				B1000032 /* WorkoutExecutionView.swift */,
+				B1000034 /* HistoryView.swift */,
+				B1000036 /* StravaAuthView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		E1000006 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				B1000006 /* FTMSConstants.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		E1000007 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C1000001 /* TrainerApp.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F1000001 /* TrainerApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = G1000003 /* Build configuration list for PBXNativeTarget "TrainerApp" */;
+			buildPhases = (
+				D1000002 /* Sources */,
+				D1000001 /* Frameworks */,
+				D1000003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TrainerApp;
+			productName = TrainerApp;
+			productReference = C1000001 /* TrainerApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F1000002 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1540;
+				LastUpgradeCheck = 1540;
+			};
+			buildConfigurationList = G1000001 /* Build configuration list for PBXProject "TrainerApp" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = E1000001;
+			productRefGroup = E1000007 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F1000001 /* TrainerApp */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D1000003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1000011 /* Assets.xcassets in Resources */,
+				A1000014 /* AppIcon60x60@2x.png in Resources */,
+				A1000015 /* AppIcon60x60@3x.png in Resources */,
+				A1000016 /* AppIcon76x76@2x.png in Resources */,
+				A1000017 /* AppIcon83.5x83.5@2x.png in Resources */,
+				A1000018 /* AppIcon-20@2x.png in Resources */,
+				A1000019 /* AppIcon-20@3x.png in Resources */,
+				A1000020 /* AppIcon-29@2x.png in Resources */,
+				A1000021 /* AppIcon-29@3x.png in Resources */,
+				A1000022 /* AppIcon-40@2x.png in Resources */,
+				A1000023 /* AppIcon-40@3x.png in Resources */,
+				A1000027 /* endurance_1hr.zwo in Resources */,
+				A1000028 /* sweet_spot_3x10.zwo in Resources */,
+				A1000029 /* vo2max_5x3.zwo in Resources */,
+				A1000030 /* threshold_2x20.zwo in Resources */,
+				A1000031 /* recovery_30min.zwo in Resources */,
+				A1000037 /* ftp_test_20min.zwo in Resources */,
+				A1000038 /* over_unders_3x12.zwo in Resources */,
+				A1000039 /* tabata_intervals.zwo in Resources */,
+				A1000040 /* tempo_45min.zwo in Resources */,
+				A1000041 /* microbursts_15x15.zwo in Resources */,
+				A1000042 /* sprint_power_6x30.zwo in Resources */,
+				A1000043 /* pyramid_intervals.zwo in Resources */,
+				A1000044 /* endurance_90min.zwo in Resources */,
+				A1000045 /* race_simulation.zwo in Resources */,
+				A1000046 /* sweetspot_2x30.zwo in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D1000002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1000001 /* TrainerApp.swift in Sources */,
+				A1000002 /* ScanView.swift in Sources */,
+				A1000003 /* DashboardView.swift in Sources */,
+				A1000004 /* BluetoothManager.swift in Sources */,
+				A1000005 /* TrainerData.swift in Sources */,
+				A1000006 /* FTMSConstants.swift in Sources */,
+				A1000007 /* TrainerProtocol.swift in Sources */,
+				A1000008 /* FTMSTrainerService.swift in Sources */,
+				A1000009 /* SavedTrainer.swift in Sources */,
+				A1000010 /* SettingsView.swift in Sources */,
+				A1000012 /* TacxFECTrainerService.swift in Sources */,
+				A1000013 /* ControlView.swift in Sources */,
+				A1000024 /* WorkoutPlan.swift in Sources */,
+				A1000025 /* UserSettings.swift in Sources */,
+				A1000026 /* WorkoutsView.swift in Sources */,
+				A1000032 /* WorkoutExecutionView.swift in Sources */,
+				A1000033 /* WorkoutSession.swift in Sources */,
+				A1000034 /* HistoryView.swift in Sources */,
+				A1000035 /* StravaService.swift in Sources */,
+				A1000036 /* StravaAuthView.swift in Sources */,
+				A1000047 /* Config.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		G1000004 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		G1000005 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		G1000006 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = TrainerApp/TrainerApp.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BFXHRE83T3;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TrainerApp/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "TrainerApp needs Bluetooth to connect to your Tacx cycling trainer.";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "TrainerApp needs Bluetooth to connect to your Tacx cycling trainer.";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.trainerapp.TrainerApp;
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.balajithanigaiarasu.TrainerApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_DESIGNED_FOR_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		G1000007 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = TrainerApp/TrainerApp.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BFXHRE83T3;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TrainerApp/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "TrainerApp needs Bluetooth to connect to your Tacx cycling trainer.";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "TrainerApp needs Bluetooth to connect to your Tacx cycling trainer.";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.trainerapp.TrainerApp;
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.balajithanigaiarasu.TrainerApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_DESIGNED_FOR_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		G1000001 /* Build configuration list for PBXProject "TrainerApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				G1000004 /* Debug */,
+				G1000005 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		G1000003 /* Build configuration list for PBXNativeTarget "TrainerApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				G1000006 /* Debug */,
+				G1000007 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F1000002 /* Project object */;
+}

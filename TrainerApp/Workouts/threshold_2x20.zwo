@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workout_file>
+    <name>Threshold 2x20</name>
+    <description>Two 20-minute intervals at FTP</description>
+    <workout>
+        <Warmup Duration="600" PowerLow="0.40" PowerHigh="0.60"/>
+        <IntervalsT Repeat="2" OnDuration="1200" OnPower="0.95" OffDuration="300" OffPower="0.50"/>
+        <Cooldown Duration="300" PowerLow="0.50" PowerHigh="0.40"/>
+    </workout>
+</workout_file>

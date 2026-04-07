@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workout_file>
+    <name>FTP Test (20 min)</name>
+    <description>20-minute FTP test. Multiply result by 0.95 for your FTP.</description>
+    <workout>
+        <Warmup Duration="600" PowerLow="0.40" PowerHigh="0.60"/>
+        <SteadyState Duration="60" Power="0.80"/>
+        <SteadyState Duration="60" Power="0.50"/>
+        <SteadyState Duration="60" Power="0.90"/>
+        <SteadyState Duration="60" Power="0.50"/>
+        <SteadyState Duration="60" Power="1.00"/>
+        <SteadyState Duration="300" Power="0.50"/>
+        <SteadyState Duration="1200" Power="1.00"/>
+        <Cooldown Duration="300" PowerLow="0.50" PowerHigh="0.40"/>
+    </workout>
+</workout_file>

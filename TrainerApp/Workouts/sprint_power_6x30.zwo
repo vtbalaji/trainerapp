@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workout_file>
+    <name>Sprint Power 6x30sec</name>
+    <description>Short max sprints with full recovery. Builds peak power output.</description>
+    <workout>
+        <Warmup Duration="600" PowerLow="0.45" PowerHigh="0.65"/>
+        <SteadyState Duration="60" Power="0.90"/>
+        <SteadyState Duration="120" Power="0.50"/>
+        <IntervalsT Repeat="6" OnDuration="30" OnPower="2.00" OffDuration="270" OffPower="0.45"/>
+        <Cooldown Duration="300" PowerLow="0.50" PowerHigh="0.40"/>
+    </workout>
+</workout_file>

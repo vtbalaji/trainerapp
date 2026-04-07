@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workout_file>
+    <name>Over-Unders 3x12</name>
+    <description>Threshold intervals alternating above and below FTP. Great for TT and climbing.</description>
+    <workout>
+        <Warmup Duration="600" PowerLow="0.45" PowerHigh="0.65"/>
+        <IntervalsT Repeat="3" OnDuration="720" OnPower="0.95" OffDuration="300" OffPower="0.50"/>
+        <Cooldown Duration="300" PowerLow="0.50" PowerHigh="0.40"/>
+    </workout>
+</workout_file>

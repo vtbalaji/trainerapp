@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workout_file>
+    <name>Tabata Intervals</name>
+    <description>Classic Tabata: 8x20sec max effort with 10sec rest. Very intense!</description>
+    <workout>
+        <Warmup Duration="600" PowerLow="0.40" PowerHigh="0.60"/>
+        <SteadyState Duration="300" Power="0.70"/>
+        <IntervalsT Repeat="8" OnDuration="20" OnPower="1.70" OffDuration="10" OffPower="0.40"/>
+        <SteadyState Duration="300" Power="0.50"/>
+        <IntervalsT Repeat="8" OnDuration="20" OnPower="1.70" OffDuration="10" OffPower="0.40"/>
+        <Cooldown Duration="300" PowerLow="0.50" PowerHigh="0.35"/>
+    </workout>
+</workout_file>

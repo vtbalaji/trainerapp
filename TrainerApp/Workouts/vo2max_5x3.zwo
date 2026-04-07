@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workout_file>
+    <name>VO2max 5x3</name>
+    <description>Five 3-minute intervals at VO2max intensity</description>
+    <workout>
+        <Warmup Duration="600" PowerLow="0.40" PowerHigh="0.60"/>
+        <IntervalsT Repeat="5" OnDuration="180" OnPower="1.15" OffDuration="180" OffPower="0.50"/>
+        <Cooldown Duration="300" PowerLow="0.50" PowerHigh="0.40"/>
+    </workout>
+</workout_file>

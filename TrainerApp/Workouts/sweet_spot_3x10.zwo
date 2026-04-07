@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workout_file>
+    <name>Sweet Spot 3x10</name>
+    <description>Three 10-minute intervals at sweet spot intensity</description>
+    <workout>
+        <Warmup Duration="300" PowerLow="0.40" PowerHigh="0.55"/>
+        <IntervalsT Repeat="3" OnDuration="600" OnPower="0.88" OffDuration="180" OffPower="0.50"/>
+        <Cooldown Duration="300" PowerLow="0.50" PowerHigh="0.40"/>
+    </workout>
+</workout_file>

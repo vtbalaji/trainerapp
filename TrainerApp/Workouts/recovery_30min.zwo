@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workout_file>
+    <name>Recovery 30min</name>
+    <description>Easy recovery spin</description>
+    <workout>
+        <Warmup Duration="300" PowerLow="0.35" PowerHigh="0.45"/>
+        <SteadyState Duration="1200" Power="0.45"/>
+        <Cooldown Duration="300" PowerLow="0.45" PowerHigh="0.35"/>
+    </workout>
+</workout_file>

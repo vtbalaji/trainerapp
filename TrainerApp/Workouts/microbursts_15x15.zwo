@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workout_file>
+    <name>Microbursts 15/15</name>
+    <description>15sec on, 15sec off repeats. Improves neuromuscular power and repeatability.</description>
+    <workout>
+        <Warmup Duration="600" PowerLow="0.45" PowerHigh="0.65"/>
+        <IntervalsT Repeat="20" OnDuration="15" OnPower="1.50" OffDuration="15" OffPower="0.50"/>
+        <SteadyState Duration="300" Power="0.50"/>
+        <IntervalsT Repeat="20" OnDuration="15" OnPower="1.50" OffDuration="15" OffPower="0.50"/>
+        <SteadyState Duration="300" Power="0.50"/>
+        <IntervalsT Repeat="20" OnDuration="15" OnPower="1.50" OffDuration="15" OffPower="0.50"/>
+        <Cooldown Duration="300" PowerLow="0.50" PowerHigh="0.40"/>
+    </workout>
+</workout_file>

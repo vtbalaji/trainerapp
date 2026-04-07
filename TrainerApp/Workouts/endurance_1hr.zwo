@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workout_file>
+    <name>Endurance 1 Hour</name>
+    <description>Easy endurance ride at low intensity</description>
+    <workout>
+        <Warmup Duration="300" PowerLow="0.40" PowerHigh="0.55"/>
+        <SteadyState Duration="2700" Power="0.65"/>
+        <Cooldown Duration="300" PowerLow="0.55" PowerHigh="0.40"/>
+    </workout>
+</workout_file>

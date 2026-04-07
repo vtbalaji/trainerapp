@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workout_file>
+    <name>Endurance 90min</name>
+    <description>Long steady endurance ride. Base building and fat adaptation.</description>
+    <workout>
+        <Warmup Duration="600" PowerLow="0.40" PowerHigh="0.55"/>
+        <SteadyState Duration="4200" Power="0.65"/>
+        <Cooldown Duration="300" PowerLow="0.55" PowerHigh="0.40"/>
+    </workout>
+</workout_file>

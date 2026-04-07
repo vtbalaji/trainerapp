@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workout_file>
+    <name>Pyramid Intervals</name>
+    <description>1-2-3-4-3-2-1 minute pyramid at threshold. Mental and physical challenge.</description>
+    <workout>
+        <Warmup Duration="600" PowerLow="0.45" PowerHigh="0.65"/>
+        <SteadyState Duration="60" Power="1.00"/>
+        <SteadyState Duration="60" Power="0.50"/>
+        <SteadyState Duration="120" Power="1.00"/>
+        <SteadyState Duration="60" Power="0.50"/>
+        <SteadyState Duration="180" Power="1.00"/>
+        <SteadyState Duration="90" Power="0.50"/>
+        <SteadyState Duration="240" Power="1.00"/>
+        <SteadyState Duration="120" Power="0.50"/>
+        <SteadyState Duration="180" Power="1.00"/>
+        <SteadyState Duration="90" Power="0.50"/>
+        <SteadyState Duration="120" Power="1.00"/>
+        <SteadyState Duration="60" Power="0.50"/>
+        <SteadyState Duration="60" Power="1.00"/>
+        <Cooldown Duration="300" PowerLow="0.55" PowerHigh="0.40"/>
+    </workout>
+</workout_file>
