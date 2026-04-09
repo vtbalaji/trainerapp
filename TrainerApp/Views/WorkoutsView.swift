@@ -429,9 +429,10 @@ struct CreateWorkoutView: View {
                     
                     Picker("Category", selection: $category) {
                         ForEach(WorkoutCategory.allCases, id: \.self) { cat in
-                            Label(cat.rawValue, systemImage: cat.icon).tag(cat)
+                            Text(cat.rawValue).tag(cat)
                         }
                     }
+                    .pickerStyle(.menu)
                     
                     TextField("Description (optional)", text: $description)
                 } header: {
@@ -498,6 +499,8 @@ struct CreateWorkoutView: View {
         if let intervals = ShorthandParser.parse(text) {
             previewIntervals = intervals
             parseError = nil
+            // Auto-classify category
+            category = WorkoutCategory.classify(intervals: intervals)
         } else {
             previewIntervals = []
             parseError = "Invalid format"

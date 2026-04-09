@@ -42,6 +42,27 @@ enum WorkoutCategory: String, CaseIterable {
         case .test: return "chart.bar.fill"
         }
     }
+    
+    /// Auto-classify based on intervals
+    static func classify(intervals: [WorkoutInterval]) -> WorkoutCategory {
+        guard !intervals.isEmpty else { return .endurance }
+        
+        let workIntervals = intervals.filter { 
+            !$0.name.lowercased().contains("warmup") && 
+            !$0.name.lowercased().contains("cooldown") 
+        }
+        
+        let maxPower = workIntervals.map { $0.powerFraction }.max() ?? 0.5
+        let avgPower = workIntervals.isEmpty ? 0.5 : 
+            workIntervals.reduce(0.0) { $0 + $1.powerFraction } / Double(workIntervals.count)
+        
+        if maxPower > 1.5 { return .sprint }
+        if maxPower > 1.05 { return .vo2max }
+        if maxPower > 0.90 || avgPower > 0.88 { return .threshold }
+        if maxPower > 0.75 || avgPower > 0.72 { return .tempo }
+        if avgPower > 0.55 { return .endurance }
+        return .recovery
+    }
 }
 
 struct WorkoutPlan: Identifiable {

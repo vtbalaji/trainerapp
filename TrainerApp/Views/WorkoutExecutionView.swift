@@ -37,27 +37,32 @@ struct WorkoutExecutionView: View {
         currentInterval?.targetWatts ?? 0
     }
     
+    private var isTrainerConnected: Bool {
+        bluetooth.trainerState == .ready
+    }
+    
     var body: some View {
-        VStack(spacing: 0) {
-            // Top bar
-            HStack {
-                Button("End") {
-                    if totalElapsedTime > 30 {
-                        saveWorkout(completed: false)
+        ZStack {
+            VStack(spacing: 0) {
+                // Top bar
+                HStack {
+                    Button("End") {
+                        if totalElapsedTime > 30 {
+                            saveWorkout(completed: false)
+                        }
+                        stopWorkout()
+                        dismiss()
                     }
-                    stopWorkout()
-                    dismiss()
-                }
-                .foregroundStyle(.red)
-                
-                Spacer()
-                
-                Text(plan.name)
-                    .font(.headline)
-                
-                Spacer()
-                
-                Button(isRunning ? "Pause" : "Resume") {
+                    .foregroundStyle(.red)
+                    
+                    Spacer()
+                    
+                    Text(plan.name)
+                        .font(.headline)
+                    
+                    Spacer()
+                    
+                    Button(isRunning ? "Pause" : "Resume") {
                     if isRunning {
                         pauseWorkout()
                     } else {
@@ -133,6 +138,44 @@ struct WorkoutExecutionView: View {
             )
             .frame(height: 120)
             .padding()
+            }
+            
+            // Not connected overlay
+            if !isTrainerConnected {
+                Color.black.opacity(0.8)
+                    .ignoresSafeArea()
+                
+                VStack(spacing: 20) {
+                    Image(systemName: "antenna.radiowaves.left.and.right.slash")
+                        .font(.system(size: 50))
+                        .foregroundStyle(.orange)
+                    
+                    Text("Trainer Not Connected")
+                        .font(.title2.bold())
+                        .foregroundStyle(.white)
+                    
+                    Button {
+                        bluetooth.autoReconnectSavedDevices()
+                    } label: {
+                        HStack {
+                            Image(systemName: "link")
+                            Text("Connect")
+                        }
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 40)
+                        .padding(.vertical, 12)
+                        .background(.orange)
+                        .cornerRadius(10)
+                    }
+                    
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                    .foregroundStyle(.gray)
+                    .padding(.top, 10)
+                }
+            }
         }
         .onAppear {
             if let interval = currentInterval {
@@ -204,6 +247,12 @@ struct WorkoutExecutionView: View {
         playIntervalBeep()
         if currentIntervalIndex >= plan.intervals.count {
             saveWorkout(completed: true)
+            
+            // Calculate VO2max if this is a ramp test
+            if plan.fileName.contains("ramp") {
+                calculateVO2maxFromRampTest()
+            }
+            
             stopWorkout()
             dismiss()
             return
@@ -216,6 +265,22 @@ struct WorkoutExecutionView: View {
     
     private func playIntervalBeep() {
         AudioServicesPlaySystemSound(1007) // Standard beep
+    }
+    
+    private func calculateVO2maxFromRampTest() {
+        // Find max 1-minute average power from detailed data
+        guard detailedData.count >= 60 else { return }
+        
+        var maxOneMinPower = 0
+        for i in 0...(detailedData.count - 60) {
+            let oneMinSlice = detailedData[i..<(i + 60)]
+            let avgPower = oneMinSlice.reduce(0) { $0 + $1.power } / 60
+            maxOneMinPower = max(maxOneMinPower, avgPower)
+        }
+        
+        if maxOneMinPower > 0 {
+            UserSettings.shared.updateVO2max(from: maxOneMinPower)
+        }
     }
     
     private func saveWorkout(completed: Bool) {

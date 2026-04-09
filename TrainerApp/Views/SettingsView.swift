@@ -123,6 +123,30 @@ struct SettingsView: View {
                         Text("W")
                             .foregroundStyle(.secondary)
                     }
+                    HStack {
+                        Text("Weight")
+                        Spacer()
+                        TextField("Weight", value: $userSettings.weight, format: .number)
+                            .multilineTextAlignment(.trailing)
+                            .frame(width: 80)
+                        Text("kg")
+                            .foregroundStyle(.secondary)
+                    }
+                    if userSettings.vo2max > 0 {
+                        HStack {
+                            Text("VO2max")
+                            Spacer()
+                            Text(String(format: "%.1f", userSettings.vo2max))
+                                .foregroundStyle(.orange)
+                            Text("ml/kg/min")
+                                .foregroundStyle(.secondary)
+                        }
+                        if let date = userSettings.vo2maxDate {
+                            Text("From ramp test on \(date.formatted(date: .abbreviated, time: .omitted))")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
                 } header: {
                     Label("Profile", systemImage: "person.fill")
                 }

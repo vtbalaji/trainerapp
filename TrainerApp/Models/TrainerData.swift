@@ -156,17 +156,29 @@ struct TrainerData {
                 let now = Date()
                 let timeDiff = now.timeIntervalSince(previous.lastCrankTime)
                 
-                if timeDiff > 0.1 && timeDiff < 3.0 {
+                if timeDiff > 0.2 && timeDiff < 3.0 {
                     // Handle rollover (8-bit counter)
                     var revDiff = Int(currentRevs) - Int(previous.lastCrankRevs)
                     if revDiff < 0 { revDiff += 256 }
                     
-                    if revDiff > 0 && revDiff < 10 { // sanity check
-                        result.instantaneousCadence = Double(revDiff) / timeDiff * 60.0
+                    if revDiff > 0 && revDiff < 20 {
+                        let calculatedRPM = Double(revDiff) / timeDiff * 60.0
+                        // Cap at realistic max cadence (180 rpm)
+                        if calculatedRPM <= 180 {
+                            result.instantaneousCadence = calculatedRPM
+                        } else {
+                            result.instantaneousCadence = previous.instantaneousCadence
+                        }
                     } else if revDiff == 0 {
-                        // No new revolutions - cadence is 0 or decaying
-                        result.instantaneousCadence = max(0, previous.instantaneousCadence * 0.8)
+                        // No new revolutions - decay toward 0
+                        result.instantaneousCadence = max(0, previous.instantaneousCadence * 0.7)
                     }
+                } else if timeDiff >= 3.0 {
+                    // Too long since last reading - assume stopped
+                    result.instantaneousCadence = 0
+                } else {
+                    // Too short interval - keep previous
+                    result.instantaneousCadence = previous.instantaneousCadence
                 }
                 
                 result.lastCrankRevs = currentRevs
@@ -185,15 +197,24 @@ struct TrainerData {
                 let now = Date()
                 let timeDiff = now.timeIntervalSince(previous.lastCrankTime)
                 
-                if timeDiff > 0.1 && timeDiff < 3.0 {
+                if timeDiff > 0.2 && timeDiff < 3.0 {
                     var revDiff = Int(currentRevs) - Int(previous.lastCrankRevs)
                     if revDiff < 0 { revDiff += 256 }
                     
-                    if revDiff > 0 && revDiff < 10 {
-                        result.instantaneousCadence = Double(revDiff) / timeDiff * 60.0
+                    if revDiff > 0 && revDiff < 20 {
+                        let calculatedRPM = Double(revDiff) / timeDiff * 60.0
+                        if calculatedRPM <= 180 {
+                            result.instantaneousCadence = calculatedRPM
+                        } else {
+                            result.instantaneousCadence = previous.instantaneousCadence
+                        }
                     } else if revDiff == 0 {
-                        result.instantaneousCadence = max(0, previous.instantaneousCadence * 0.8)
+                        result.instantaneousCadence = max(0, previous.instantaneousCadence * 0.7)
                     }
+                } else if timeDiff >= 3.0 {
+                    result.instantaneousCadence = 0
+                } else {
+                    result.instantaneousCadence = previous.instantaneousCadence
                 }
                 
                 result.lastCrankRevs = currentRevs
