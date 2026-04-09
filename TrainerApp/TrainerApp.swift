@@ -5,6 +5,7 @@ enum AppTab: String, CaseIterable {
     case dashboard = "Dashboard"
     case control = "Control"
     case history = "History"
+    case scale = "Scale"
     case settings = "Settings"
 
     var icon: String {
@@ -13,6 +14,7 @@ enum AppTab: String, CaseIterable {
         case .dashboard: "gauge.with.dots.needle.bottom.50percent"
         case .control: "slider.horizontal.3"
         case .history: "clock.arrow.circlepath"
+        case .scale: "scalemass.fill"
         case .settings: "gearshape"
         }
     }
@@ -64,6 +66,8 @@ struct TrainerApp: App {
                             WorkoutsView()
                         case .history:
                             HistoryView()
+                        case .scale:
+                            ScaleView()
                         case .settings:
                             SettingsView()
                         }

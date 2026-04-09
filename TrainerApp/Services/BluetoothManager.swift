@@ -53,6 +53,20 @@ struct DiscoveredDevice: Identifiable, Equatable {
             || lowerName.contains("verity") {
             return .heartRate
         }
+        
+        // Scale detection
+        if advertisedServices.contains(FTMSConstants.bodyCompositionServiceUUID)
+            || advertisedServices.contains(FTMSConstants.weightScaleServiceUUID)
+            || lowerName.contains("scale")
+            || lowerName.contains("actofit")
+            || lowerName.contains("xiaomi")
+            || lowerName.contains("mi body")
+            || lowerName.contains("renpho")
+            || lowerName.contains("eufy")
+            || lowerName.contains("withings") {
+            return .scale
+        }
+        
         return .unknown
     }
 
@@ -64,6 +78,7 @@ struct DiscoveredDevice: Identifiable, Equatable {
 enum DeviceType: String, Codable {
     case trainer
     case heartRate
+    case scale
     case unknown
 }
 
@@ -102,16 +117,24 @@ final class BluetoothManager: NSObject, ObservableObject {
     @Published var hrState: ConnectionState = .disconnected
     @Published var currentHeartRate: UInt8 = 0
     @Published var hrDeviceName: String = ""
+    
+    // Scale state
+    @Published var scaleState: ConnectionState = .disconnected
+    @Published var scaleData: ScaleData = ScaleData()
 
     // MARK: - Peripheral tracking
 
     private var centralManager: CBCentralManager!
     private var trainerPeripheral: CBPeripheral?
     private var hrPeripheral: CBPeripheral?
+    private var scalePeripheral: CBPeripheral?
+    private var savedScaleID: UUID?  // For auto-connect
+    @Published var autoConnectScale: Bool = true
     private var controlPointCharacteristic: CBCharacteristic?
     private var tacxWriteCharacteristic: CBCharacteristic?
 
     // MARK: - Computed
+    var scalePeripheralID: UUID? { scalePeripheral?.identifier }
 
     var trainerPeripheralID: UUID? { trainerPeripheral?.identifier }
     var trainerPeripheralName: String? { trainerPeripheral?.name }
@@ -132,6 +155,33 @@ final class BluetoothManager: NSObject, ObservableObject {
     override init() {
         super.init()
         centralManager = CBCentralManager(delegate: self, queue: nil)
+        
+        // Load saved scale ID for auto-connect
+        if let idString = UserDefaults.standard.string(forKey: "savedScaleID"),
+           let uuid = UUID(uuidString: idString) {
+            savedScaleID = uuid
+        }
+    }
+    
+    /// Start background scanning for scale auto-connect
+    func startScaleScan() {
+        guard centralManager.state == .poweredOn else { return }
+        guard scaleState == .disconnected else { return }
+        
+        log("Scanning for scale...")
+        centralManager.scanForPeripherals(
+            withServices: nil,
+            options: [CBCentralManagerScanOptionAllowDuplicatesKey: false]
+        )
+        
+        // Stop after 15 seconds if scale not found
+        Task {
+            try? await Task.sleep(for: .seconds(15))
+            if scaleState == .disconnected && !isScanning {
+                centralManager.stopScan()
+                log("Scale scan timeout")
+            }
+        }
     }
 
     // MARK: - Scanning
@@ -277,6 +327,27 @@ final class BluetoothManager: NSObject, ObservableObject {
         log("HR disconnected")
         updateStatusMessage()
     }
+    
+    // MARK: - Scale Connection
+    
+    func connectScale(_ device: DiscoveredDevice) {
+        scaleState = .connecting
+        statusMessage = "Connecting scale: \(device.name)..."
+        log("Connecting scale: \(device.name)")
+        scalePeripheral = device.peripheral
+        centralManager.connect(device.peripheral, options: nil)
+        startTimeout(for: .scale, name: device.name)
+    }
+    
+    func disconnectScale() {
+        if let peripheral = scalePeripheral {
+            centralManager.cancelPeripheralConnection(peripheral)
+        }
+        scalePeripheral = nil
+        scaleState = .disconnected
+        log("Scale disconnected")
+        updateStatusMessage()
+    }
 
     // MARK: - Write Commands
 
@@ -317,6 +388,12 @@ final class BluetoothManager: NSObject, ObservableObject {
                     disconnectHR()
                     statusMessage = "HR connection timed out"
                 }
+            case .scale:
+                if scaleState == .connecting {
+                    log("Scale connection timeout")
+                    disconnectScale()
+                    statusMessage = "Scale connection timed out"
+                }
             case .unknown:
                 break
             }
@@ -338,10 +415,11 @@ final class BluetoothManager: NSObject, ObservableObject {
         }
     }
 
-    /// Identify which peripheral this is (trainer or HR)
+    /// Identify which peripheral this is (trainer, HR, or scale)
     private func peripheralRole(_ peripheral: CBPeripheral) -> DeviceType {
         if peripheral.identifier == trainerPeripheral?.identifier { return .trainer }
         if peripheral.identifier == hrPeripheral?.identifier { return .heartRate }
+        if peripheral.identifier == scalePeripheral?.identifier { return .scale }
         return .unknown
     }
 }
@@ -396,6 +474,20 @@ extension BluetoothManager: CBCentralManagerDelegate {
                 let serviceStr = serviceUUIDs.map { $0.uuidString }.joined(separator: ", ")
                 log("Found: \(name) | RSSI: \(RSSI) | Services: [\(serviceStr)] | Type: \(device.deviceType)")
                 statusMessage = "Found \(discoveredDevices.count) device(s)..."
+                
+                // Auto-connect to saved scale
+                if autoConnectScale && scaleState == .disconnected {
+                    if let savedID = savedScaleID, peripheral.identifier == savedID {
+                        log("Auto-connecting to saved scale: \(name)")
+                        connectScale(device)
+                    } else if device.deviceType == .scale {
+                        // First time - remember and connect
+                        savedScaleID = peripheral.identifier
+                        UserDefaults.standard.set(peripheral.identifier.uuidString, forKey: "savedScaleID")
+                        log("Auto-connecting to scale: \(name)")
+                        connectScale(device)
+                    }
+                }
             }
         }
     }
@@ -412,6 +504,9 @@ extension BluetoothManager: CBCentralManagerDelegate {
             case .heartRate:
                 hrState = .connected
                 statusMessage = "HR connected — discovering services..."
+            case .scale:
+                scaleState = .connected
+                statusMessage = "Scale connected — discovering services..."
             case .unknown:
                 log("Connected unknown peripheral — treating as trainer")
                 trainerPeripheral = peripheral
@@ -431,6 +526,7 @@ extension BluetoothManager: CBCentralManagerDelegate {
             switch role {
             case .trainer: trainerState = .disconnected
             case .heartRate: hrState = .disconnected
+            case .scale: scaleState = .disconnected
             case .unknown: break
             }
             statusMessage = "Connection failed: \(msg)"
@@ -454,6 +550,9 @@ extension BluetoothManager: CBCentralManagerDelegate {
                 hrPeripheral = nil
                 hrState = .disconnected
                 currentHeartRate = 0
+            case .scale:
+                scalePeripheral = nil
+                scaleState = .disconnected
             case .unknown:
                 break
             }
@@ -531,6 +630,14 @@ extension BluetoothManager: CBPeripheralDelegate {
                     for service in services {
                         peripheral.discoverCharacteristics(nil, for: service)
                     }
+                }
+            }
+            
+            // For scale peripheral
+            if role == .scale {
+                log("Scale services found, discovering all characteristics...")
+                for service in services {
+                    peripheral.discoverCharacteristics(nil, for: service)
                 }
             }
         }
@@ -611,12 +718,36 @@ extension BluetoothManager: CBPeripheralDelegate {
                 }
                 if role == .heartRate {
                     hrState = .ready
-                    log("HR monitor ready!")
-                } else {
-                    log("Built-in HR on trainer ready")
+                }
+            }
+            
+            // Body Composition / Weight Scale service
+            if service.uuid == FTMSConstants.bodyCompositionServiceUUID || 
+               service.uuid == FTMSConstants.weightScaleServiceUUID {
+                for c in characteristics {
+                    if c.properties.contains(.notify) || c.properties.contains(.indicate) {
+                        peripheral.setNotifyValue(true, for: c)
+                        log("Subscribed scale char: \(c.uuid.uuidString)")
+                    }
+                }
+                if role == .scale {
+                    scaleState = .ready
+                    statusMessage = "Scale ready - step on to measure"
+                    log("Scale ready!")
                 }
                 updateStatusMessage()
-                return
+            }
+            
+            // For scale - also subscribe to any service with notify
+            if role == .scale {
+                for c in characteristics {
+                    if c.properties.contains(.notify) || c.properties.contains(.indicate) {
+                        peripheral.setNotifyValue(true, for: c)
+                        log("Scale auto-sub: \(c.uuid.uuidString)")
+                    }
+                }
+                scaleState = .ready
+                statusMessage = "Scale connected - step on to measure"
             }
 
             // Unknown service — subscribe to all notify chars
@@ -676,10 +807,35 @@ extension BluetoothManager: CBPeripheralDelegate {
                 // Also update trainerData so dashboard shows it
                 latestTrainerData.heartRate = hr
                 log("HR: \(hr) bpm")
+            
+            // Body Composition
+            case FTMSConstants.bodyCompositionMeasurementUUID:
+                let hex = data.map { String(format: "%02X", $0) }.joined(separator: " ")
+                log("Body Composition [\(data.count)B]: \(hex)")
+                scaleData = ScaleData.parseBodyComposition(from: data)
+                scaleState = .ready
+                updateUserSettingsFromScale()
+            
+            // Weight Measurement
+            case FTMSConstants.weightMeasurementUUID:
+                let hex = data.map { String(format: "%02X", $0) }.joined(separator: " ")
+                log("Weight [\(data.count)B]: \(hex)")
+                let weight = ScaleData.parseWeight(from: data)
+                if weight > 0 {
+                    scaleData.weight = weight
+                    scaleData.timestamp = Date()
+                    scaleState = .ready
+                    updateUserSettingsFromScale()
+                }
 
             default:
                 let hex = data.map { String(format: "%02X", $0) }.joined(separator: " ")
                 log("DATA \(characteristic.uuid.uuidString) [\(data.count)B]: \(hex)")
+                
+                // Try to parse scale data from any characteristic if we're connected to a scale
+                if scaleState == .ready || scaleState == .connected {
+                    tryParseScaleData(data, from: characteristic.uuid.uuidString)
+                }
             }
         }
     }
@@ -709,5 +865,83 @@ extension BluetoothManager: CBPeripheralDelegate {
             return UInt8(min(255, hr16))
         }
         return 0
+    }
+    
+    // MARK: - Scale Data
+    
+    @MainActor
+    private func updateUserSettingsFromScale() {
+        if scaleData.weight > 0 {
+            UserSettings.shared.weight = scaleData.weight
+            log("Updated weight from scale: \(String(format: "%.1f", scaleData.weight)) kg")
+        }
+    }
+    
+    @MainActor
+    private func tryParseScaleData(_ data: Data, from uuid: String) {
+        guard data.count >= 8 else { return }
+        
+        // Actofit FFB2 format: XX 07 00 A2 03 18 00 [WW WW] ...
+        // Weight at bytes 7-8 (BIG-ENDIAN, /1000 for kg)
+        if uuid.contains("FFB2") && data.count >= 9 {
+            let weightRaw = (UInt16(data[7]) << 8) | UInt16(data[8])  // Big-endian
+            let weight = Double(weightRaw) / 1000.0
+            if weight > 20 && weight < 200 {
+                scaleData.weight = weight
+                scaleData.timestamp = Date()
+                log("✓ Weight: \(String(format: "%.2f", weight)) kg")
+                updateUserSettingsFromScale()
+            }
+        }
+        
+        // Actofit FFB3 body composition packet (header 0x1E 00) - contains weight and body data
+        // 00 1E 00 A3 18 00 [WW WW] 00 [data pairs...]
+        if uuid.contains("FFB3") && data.count >= 18 && data[1] == 0x1E && data[2] == 0x00 {
+            // Weight at bytes 6-7 (BIG-ENDIAN)
+            let weightRaw = (UInt16(data[6]) << 8) | UInt16(data[7])  // Big-endian
+            let weight = Double(weightRaw) / 1000.0
+            if weight > 20 && weight < 200 {
+                scaleData.weight = weight
+                scaleData.timestamp = Date()
+                log("✓ Weight: \(String(format: "%.2f", weight)) kg")
+                updateUserSettingsFromScale()
+            }
+            
+            // Body composition values at bytes 9-18 (pairs as BIG-ENDIAN / 10)
+            if data.count >= 19 {
+                let v1 = Double((UInt16(data[9]) << 8) | UInt16(data[10])) / 10.0
+                let v2 = Double((UInt16(data[11]) << 8) | UInt16(data[12])) / 10.0
+                let v3 = Double((UInt16(data[13]) << 8) | UInt16(data[14])) / 10.0
+                let v4 = Double((UInt16(data[15]) << 8) | UInt16(data[16])) / 10.0
+                let v5 = Double((UInt16(data[17]) << 8) | UInt16(data[18])) / 10.0
+                
+                log("Body values: \(String(format: "%.1f %.1f %.1f %.1f %.1f", v1, v2, v3, v4, v5))")
+                
+                // These are likely segment impedances, not final body composition
+                // Actofit calculates final values using these + user profile
+            }
+        }
+        
+        // Actofit FFB3 impedance packet (header 0x1E 01) - raw impedance values in ohms
+        if uuid.contains("FFB3") && data.count >= 15 && data[1] == 0x1E && data[2] == 0x01 {
+            var values: [Double] = []
+            for i in stride(from: 3, to: min(data.count - 1, 15), by: 2) {
+                let v = Double((UInt16(data[i]) << 8) | UInt16(data[i+1]))  // No division - raw ohms
+                values.append(v)
+            }
+            scaleData.impedances = values
+            log("Impedance: \(values.map { String(format: "%.0f", $0) }.joined(separator: ", ")) ohms")
+            
+            // Calculate body composition if we have weight
+            if scaleData.weight > 0 {
+                let settings = UserSettings.shared
+                scaleData.calculateBodyComposition(
+                    height: settings.height,
+                    age: settings.age,
+                    gender: settings.gender
+                )
+                log("✓ Body Fat: \(String(format: "%.1f", scaleData.bodyFat))%, Muscle: \(String(format: "%.1f", scaleData.muscleMass))kg, Water: \(String(format: "%.1f", scaleData.waterPercentage))%")
+            }
+        }
     }
 }

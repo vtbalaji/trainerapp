@@ -63,6 +63,15 @@ struct ScanView: View {
                         }
                     }
                     
+                    let scales = bluetooth.discoveredDevices.filter { $0.deviceType == .scale }
+                    if !scales.isEmpty {
+                        Section("Scales") {
+                            ForEach(scales) { device in
+                                DeviceRow(device: device, bluetooth: bluetooth)
+                            }
+                        }
+                    }
+                    
                     let others = bluetooth.discoveredDevices.filter { $0.deviceType == .unknown }
                     if !others.isEmpty {
                         Section {
@@ -203,6 +212,9 @@ struct DeviceRow: View {
     private var isHRConnected: Bool {
         bluetooth.hrPeripheralID == device.id && bluetooth.hrState == .ready
     }
+    private var isScaleConnected: Bool {
+        bluetooth.scalePeripheralID == device.id && bluetooth.scaleState == .ready
+    }
 
     var body: some View {
         HStack {
@@ -218,9 +230,15 @@ struct DeviceRow: View {
             }
             Spacer()
 
-            if isTrainerConnected || isHRConnected {
+            if isTrainerConnected || isHRConnected || isScaleConnected {
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundStyle(.green)
+            } else if device.deviceType == .scale {
+                Button("Connect") {
+                    bluetooth.connectScale(device)
+                }
+                .font(.subheadline)
+                .buttonStyle(.bordered)
             } else {
                 // Show connect buttons based on device type
                 Menu {
@@ -248,6 +266,7 @@ struct DeviceRow: View {
         switch device.deviceType {
         case .trainer: "bicycle"
         case .heartRate: "heart.fill"
+        case .scale: "scalemass.fill"
         case .unknown: "questionmark.circle"
         }
     }
@@ -256,6 +275,7 @@ struct DeviceRow: View {
         switch device.deviceType {
         case .trainer: .blue
         case .heartRate: .red
+        case .scale: .purple
         case .unknown: .gray
         }
     }

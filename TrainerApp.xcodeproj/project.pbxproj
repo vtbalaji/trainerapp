@@ -32,6 +32,8 @@
 		A1000013 /* ControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000013 /* ControlView.swift */; };
 		A1000024 /* WorkoutPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000024 /* WorkoutPlan.swift */; };
 		A1000025 /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000025 /* UserSettings.swift */; };
+		A1000049 /* ScaleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000049 /* ScaleData.swift */; };
+		A1000050 /* ScaleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000050 /* ScaleView.swift */; };
 		A1000026 /* WorkoutsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000026 /* WorkoutsView.swift */; };
 		A1000027 /* endurance_1hr.zwo in Resources */ = {isa = PBXBuildFile; fileRef = B1000027 /* endurance_1hr.zwo */; };
 		A1000028 /* sweet_spot_3x10.zwo in Resources */ = {isa = PBXBuildFile; fileRef = B1000028 /* sweet_spot_3x10.zwo */; };
@@ -84,6 +86,8 @@
 		C1000001 /* TrainerApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrainerApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B1000024 /* WorkoutPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutPlan.swift; sourceTree = "<group>"; };
 		B1000025 /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
+		B1000049 /* ScaleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScaleData.swift; sourceTree = "<group>"; };
+		B1000050 /* ScaleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScaleView.swift; sourceTree = "<group>"; };
 		B1000026 /* WorkoutsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutsView.swift; sourceTree = "<group>"; };
 		B1000027 /* endurance_1hr.zwo */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = endurance_1hr.zwo; sourceTree = "<group>"; };
 		B1000028 /* sweet_spot_3x10.zwo */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = sweet_spot_3x10.zwo; sourceTree = "<group>"; };
@@ -183,6 +187,7 @@
 				B1000009 /* SavedTrainer.swift */,
 				B1000024 /* WorkoutPlan.swift */,
 				B1000025 /* UserSettings.swift */,
+				B1000049 /* ScaleData.swift */,
 				B1000033 /* WorkoutSession.swift */,
 			);
 			path = Models;
@@ -206,6 +211,7 @@
 				B1000002 /* ScanView.swift */,
 				B1000003 /* DashboardView.swift */,
 				B1000010 /* SettingsView.swift */,
+				B1000050 /* ScaleView.swift */,
 				B1000013 /* ControlView.swift */,
 				B1000026 /* WorkoutsView.swift */,
 				B1000032 /* WorkoutExecutionView.swift */,
@@ -331,10 +337,12 @@
 				A1000008 /* FTMSTrainerService.swift in Sources */,
 				A1000009 /* SavedTrainer.swift in Sources */,
 				A1000010 /* SettingsView.swift in Sources */,
+				A1000050 /* ScaleView.swift in Sources */,
 				A1000012 /* TacxFECTrainerService.swift in Sources */,
 				A1000013 /* ControlView.swift in Sources */,
 				A1000024 /* WorkoutPlan.swift in Sources */,
 				A1000025 /* UserSettings.swift in Sources */,
+				A1000049 /* ScaleData.swift in Sources */,
 				A1000026 /* WorkoutsView.swift in Sources */,
 				A1000032 /* WorkoutExecutionView.swift in Sources */,
 				A1000033 /* WorkoutSession.swift in Sources */,

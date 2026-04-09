@@ -132,6 +132,29 @@ struct SettingsView: View {
                         Text("kg")
                             .foregroundStyle(.secondary)
                     }
+                    HStack {
+                        Text("Height")
+                        Spacer()
+                        TextField("Height", value: $userSettings.height, format: .number)
+                            .multilineTextAlignment(.trailing)
+                            .frame(width: 80)
+                        Text("cm")
+                            .foregroundStyle(.secondary)
+                    }
+                    HStack {
+                        Text("Age")
+                        Spacer()
+                        TextField("Age", value: $userSettings.age, format: .number)
+                            .multilineTextAlignment(.trailing)
+                            .frame(width: 80)
+                        Text("years")
+                            .foregroundStyle(.secondary)
+                    }
+                    Picker("Gender", selection: $userSettings.gender) {
+                        ForEach(Gender.allCases, id: \.self) { g in
+                            Text(g.rawValue).tag(g)
+                        }
+                    }
                     if userSettings.vo2max > 0 {
                         HStack {
                             Text("VO2max")

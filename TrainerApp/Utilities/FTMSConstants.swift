@@ -33,6 +33,12 @@ enum FTMSConstants {
     static let heartRateMeasurementUUID = CBUUID(string: "2A37")
     /// Body Sensor Location — read
     static let bodySensorLocationUUID = CBUUID(string: "2A38")
+    
+    // MARK: - Body Composition / Weight Scale Services
+    static let bodyCompositionServiceUUID = CBUUID(string: "181B")
+    static let bodyCompositionMeasurementUUID = CBUUID(string: "2A9C")
+    static let weightScaleServiceUUID = CBUUID(string: "181D")
+    static let weightMeasurementUUID = CBUUID(string: "2A9D")
 
     // MARK: - Control Point Op Codes
     static let opCodeRequestControl: UInt8 = 0x00
