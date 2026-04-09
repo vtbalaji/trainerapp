@@ -207,6 +207,22 @@ final class BluetoothManager: NSObject, ObservableObject {
         centralManager.connect(peripheral, options: nil)
         startTimeout(for: .trainer, name: name)
     }
+    
+    func autoReconnectSavedDevices() {
+        let store = SavedTrainerStore.shared
+        
+        // Auto-reconnect saved trainer
+        if let trainer = store.savedTrainers.first, trainerState == .disconnected {
+            log("Auto-reconnecting trainer: \(trainer.displayName)")
+            reconnectTrainer(to: trainer.id, name: trainer.displayName)
+        }
+        
+        // Auto-reconnect saved HR monitor
+        if let hr = store.savedHRMonitors.first, hrState == .disconnected {
+            log("Auto-reconnecting HR: \(hr.displayName)")
+            reconnectHR(to: hr.id, name: hr.displayName)
+        }
+    }
 
     func disconnectTrainer() {
         if let peripheral = trainerPeripheral {
@@ -339,7 +355,8 @@ extension BluetoothManager: CBCentralManagerDelegate {
             log("BT state: \(central.state.rawValue)")
             switch central.state {
             case .poweredOn:
-                statusMessage = "Bluetooth ready — tap Scan"
+                statusMessage = "Bluetooth ready"
+                autoReconnectSavedDevices()
             case .poweredOff:
                 statusMessage = "Bluetooth is turned off"
                 trainerState = .disconnected

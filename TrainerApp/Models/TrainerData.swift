@@ -9,6 +9,10 @@ struct TrainerData {
     var totalDistance: UInt32 = 0           // meters
     var elapsedTime: UInt16 = 0            // seconds
     var resistanceLevel: Int16 = 0         // current resistance level
+    
+    // For cumulative cadence calculation
+    var lastCrankRevs: UInt8 = 0
+    var lastCrankTime: Date = Date()
 
     /// Parse Indoor Bike Data characteristic value per FTMS spec (0x2AD2)
     /// The first 2 bytes are flags indicating which fields are present.
@@ -146,8 +150,27 @@ struct TrainerData {
                 let powerMSB: UInt8 = data[offset + 6]
                 let power = Int16(powerLSB) | (Int16(powerMSB & 0x0F) << 8)
                 result.instantaneousPower = power
-                // Byte 4: instantaneous cadence
-                result.instantaneousCadence = Double(data[offset + 4])
+                
+                // Byte 4: cadence - calculate RPM from cumulative revolutions
+                let currentRevs = data[offset + 4]
+                let now = Date()
+                let timeDiff = now.timeIntervalSince(previous.lastCrankTime)
+                
+                if timeDiff > 0.1 && timeDiff < 3.0 {
+                    // Handle rollover (8-bit counter)
+                    var revDiff = Int(currentRevs) - Int(previous.lastCrankRevs)
+                    if revDiff < 0 { revDiff += 256 }
+                    
+                    if revDiff > 0 && revDiff < 10 { // sanity check
+                        result.instantaneousCadence = Double(revDiff) / timeDiff * 60.0
+                    } else if revDiff == 0 {
+                        // No new revolutions - cadence is 0 or decaying
+                        result.instantaneousCadence = max(0, previous.instantaneousCadence * 0.8)
+                    }
+                }
+                
+                result.lastCrankRevs = currentRevs
+                result.lastCrankTime = now
             }
 
         case 0x31: // Specific Trainer Data (page 49) — Tacx extended
@@ -156,7 +179,25 @@ struct TrainerData {
                 let powerMSB: UInt8 = data[offset + 6]
                 let power = Int16(powerLSB) | (Int16(powerMSB & 0x0F) << 8)
                 result.instantaneousPower = power
-                result.instantaneousCadence = Double(data[offset + 4])
+                
+                // Same cumulative cadence handling
+                let currentRevs = data[offset + 4]
+                let now = Date()
+                let timeDiff = now.timeIntervalSince(previous.lastCrankTime)
+                
+                if timeDiff > 0.1 && timeDiff < 3.0 {
+                    var revDiff = Int(currentRevs) - Int(previous.lastCrankRevs)
+                    if revDiff < 0 { revDiff += 256 }
+                    
+                    if revDiff > 0 && revDiff < 10 {
+                        result.instantaneousCadence = Double(revDiff) / timeDiff * 60.0
+                    } else if revDiff == 0 {
+                        result.instantaneousCadence = max(0, previous.instantaneousCadence * 0.8)
+                    }
+                }
+                
+                result.lastCrankRevs = currentRevs
+                result.lastCrankTime = now
             }
 
         default:

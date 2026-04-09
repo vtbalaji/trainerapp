@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workout_file>
+    <author>TrainerApp</author>
+    <name>Ramp Test</name>
+    <description>FTP ramp test. Start easy and increase power every minute until failure. Your FTP is estimated as 75% of your best 1-minute power.</description>
+    <sportType>bike</sportType>
+    <workout>
+        <Warmup Duration="300" PowerLow="0.40" PowerHigh="0.50"/>
+        <SteadyState Duration="60" Power="0.46" />
+        <SteadyState Duration="60" Power="0.52" />
+        <SteadyState Duration="60" Power="0.58" />
+        <SteadyState Duration="60" Power="0.64" />
+        <SteadyState Duration="60" Power="0.70" />
+        <SteadyState Duration="60" Power="0.76" />
+        <SteadyState Duration="60" Power="0.82" />
+        <SteadyState Duration="60" Power="0.88" />
+        <SteadyState Duration="60" Power="0.94" />
+        <SteadyState Duration="60" Power="1.00" />
+        <SteadyState Duration="60" Power="1.06" />
+        <SteadyState Duration="60" Power="1.12" />
+        <SteadyState Duration="60" Power="1.18" />
+        <SteadyState Duration="60" Power="1.24" />
+        <SteadyState Duration="60" Power="1.30" />
+        <SteadyState Duration="60" Power="1.36" />
+        <SteadyState Duration="60" Power="1.42" />
+        <SteadyState Duration="60" Power="1.48" />
+        <SteadyState Duration="60" Power="1.54" />
+        <SteadyState Duration="60" Power="1.60" />
+        <Cooldown Duration="300" PowerLow="0.40" PowerHigh="0.25"/>
+    </workout>
+</workout_file>

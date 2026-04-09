@@ -21,6 +21,8 @@ struct SavedDevice: Codable, Identifiable, Equatable {
 /// Manages persistence of saved devices using UserDefaults
 @MainActor
 final class SavedTrainerStore: ObservableObject {
+    static let shared = SavedTrainerStore()
+    
     @Published var savedDevices: [SavedDevice] = []
 
     private let key = "savedDevices"

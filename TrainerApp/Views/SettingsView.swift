@@ -127,6 +127,19 @@ struct SettingsView: View {
                     Label("Profile", systemImage: "person.fill")
                 }
                 
+                // Power Zones
+                Section {
+                    PowerZoneRow(zone: "Z1 Recovery", range: "0-55%", watts: "0-\(Int(Double(userSettings.ftp) * 0.55))W", color: .gray)
+                    PowerZoneRow(zone: "Z2 Endurance", range: "55-75%", watts: "\(Int(Double(userSettings.ftp) * 0.55))-\(Int(Double(userSettings.ftp) * 0.75))W", color: .blue)
+                    PowerZoneRow(zone: "Z3 Tempo", range: "75-90%", watts: "\(Int(Double(userSettings.ftp) * 0.75))-\(Int(Double(userSettings.ftp) * 0.90))W", color: .green)
+                    PowerZoneRow(zone: "Z4 Threshold", range: "90-105%", watts: "\(Int(Double(userSettings.ftp) * 0.90))-\(Int(Double(userSettings.ftp) * 1.05))W", color: .yellow)
+                    PowerZoneRow(zone: "Z5 VO2max", range: "105-120%", watts: "\(Int(Double(userSettings.ftp) * 1.05))-\(Int(Double(userSettings.ftp) * 1.20))W", color: .orange)
+                    PowerZoneRow(zone: "Z6 Anaerobic", range: "120-150%", watts: "\(Int(Double(userSettings.ftp) * 1.20))-\(Int(Double(userSettings.ftp) * 1.50))W", color: .red)
+                    PowerZoneRow(zone: "Z7 Neuromuscular", range: ">150%", watts: ">\(Int(Double(userSettings.ftp) * 1.50))W", color: .purple)
+                } header: {
+                    Label("Power Zones", systemImage: "bolt.fill")
+                }
+                
                 // Strava
                 Section {
                     if strava.isConnected {
@@ -235,6 +248,26 @@ struct SavedDeviceRow: View {
             }
         }
         .padding(.vertical, 2)
+    }
+}
+
+struct PowerZoneRow: View {
+    let zone: String
+    let range: String
+    let watts: String
+    let color: Color
+    
+    var body: some View {
+        HStack {
+            Circle()
+                .fill(color)
+                .frame(width: 12, height: 12)
+            Text(zone)
+            Spacer()
+            Text(watts)
+                .foregroundStyle(.secondary)
+        }
+        .font(.subheadline)
     }
 }
 

@@ -1,17 +1,17 @@
 import SwiftUI
 
 enum AppTab: String, CaseIterable {
+    case workouts = "Workouts"
     case dashboard = "Dashboard"
     case control = "Control"
-    case workouts = "Workouts"
     case history = "History"
     case settings = "Settings"
 
     var icon: String {
         switch self {
+        case .workouts: "figure.indoor.cycle"
         case .dashboard: "gauge.with.dots.needle.bottom.50percent"
         case .control: "slider.horizontal.3"
-        case .workouts: "figure.indoor.cycle"
         case .history: "clock.arrow.circlepath"
         case .settings: "gearshape"
         }
@@ -22,7 +22,7 @@ enum AppTab: String, CaseIterable {
 struct TrainerApp: App {
     @StateObject private var bluetooth = BluetoothManager()
     @StateObject private var trainerStore = SavedTrainerStore()
-    @State private var selectedTab: AppTab = .dashboard
+    @State private var selectedTab: AppTab = .workouts
     @State private var showMenu = false
 
     var body: some Scene {

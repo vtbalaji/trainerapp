@@ -1,4 +1,5 @@
 import SwiftUI
+import AVFoundation
 
 struct WorkoutExecutionView: View {
     let plan: WorkoutPlan
@@ -200,6 +201,7 @@ struct WorkoutExecutionView: View {
     
     private func nextInterval() {
         currentIntervalIndex += 1
+        playIntervalBeep()
         if currentIntervalIndex >= plan.intervals.count {
             saveWorkout(completed: true)
             stopWorkout()
@@ -210,6 +212,10 @@ struct WorkoutExecutionView: View {
             intervalTimeRemaining = interval.durationSeconds
         }
         setTargetPower()
+    }
+    
+    private func playIntervalBeep() {
+        AudioServicesPlaySystemSound(1007) // Standard beep
     }
     
     private func saveWorkout(completed: Bool) {

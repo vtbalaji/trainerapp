@@ -39,6 +39,7 @@
 		A1000030 /* threshold_2x20.zwo in Resources */ = {isa = PBXBuildFile; fileRef = B1000030 /* threshold_2x20.zwo */; };
 		A1000031 /* recovery_30min.zwo in Resources */ = {isa = PBXBuildFile; fileRef = B1000031 /* recovery_30min.zwo */; };
 		A1000037 /* ftp_test_20min.zwo in Resources */ = {isa = PBXBuildFile; fileRef = B1000037 /* ftp_test_20min.zwo */; };
+		A1000048 /* ramp_test.zwo in Resources */ = {isa = PBXBuildFile; fileRef = B1000048 /* ramp_test.zwo */; };
 		A1000038 /* over_unders_3x12.zwo in Resources */ = {isa = PBXBuildFile; fileRef = B1000038 /* over_unders_3x12.zwo */; };
 		A1000039 /* tabata_intervals.zwo in Resources */ = {isa = PBXBuildFile; fileRef = B1000039 /* tabata_intervals.zwo */; };
 		A1000040 /* tempo_45min.zwo in Resources */ = {isa = PBXBuildFile; fileRef = B1000040 /* tempo_45min.zwo */; };
@@ -90,6 +91,7 @@
 		B1000030 /* threshold_2x20.zwo */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = threshold_2x20.zwo; sourceTree = "<group>"; };
 		B1000031 /* recovery_30min.zwo */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = recovery_30min.zwo; sourceTree = "<group>"; };
 		B1000037 /* ftp_test_20min.zwo */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ftp_test_20min.zwo; sourceTree = "<group>"; };
+		B1000048 /* ramp_test.zwo */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ramp_test.zwo; sourceTree = "<group>"; };
 		B1000038 /* over_unders_3x12.zwo */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = over_unders_3x12.zwo; sourceTree = "<group>"; };
 		B1000039 /* tabata_intervals.zwo */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = tabata_intervals.zwo; sourceTree = "<group>"; };
 		B1000040 /* tempo_45min.zwo */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = tempo_45min.zwo; sourceTree = "<group>"; };
@@ -160,6 +162,7 @@
 				B1000030 /* threshold_2x20.zwo */,
 				B1000031 /* recovery_30min.zwo */,
 				B1000037 /* ftp_test_20min.zwo */,
+				B1000048 /* ramp_test.zwo */,
 				B1000038 /* over_unders_3x12.zwo */,
 				B1000039 /* tabata_intervals.zwo */,
 				B1000040 /* tempo_45min.zwo */,
@@ -298,6 +301,7 @@
 				A1000030 /* threshold_2x20.zwo in Resources */,
 				A1000031 /* recovery_30min.zwo in Resources */,
 				A1000037 /* ftp_test_20min.zwo in Resources */,
+				A1000048 /* ramp_test.zwo in Resources */,
 				A1000038 /* over_unders_3x12.zwo in Resources */,
 				A1000039 /* tabata_intervals.zwo in Resources */,
 				A1000040 /* tempo_45min.zwo in Resources */,

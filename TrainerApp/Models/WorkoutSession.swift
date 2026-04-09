@@ -23,6 +23,21 @@ struct WorkoutSession: Identifiable, Codable {
     var formattedDate: String {
         date.formatted(date: .abbreviated, time: .shortened)
     }
+    
+    /// Calculate TSS from actual workout data
+    var tss: Int {
+        guard durationSeconds > 0 && avgPower > 0 else { return 0 }
+        let ftp = UserSettings.shared.ftp
+        guard ftp > 0 else { return 0 }
+        
+        // Calculate Normalized Power (NP) - for simplicity using avg power
+        // In reality NP requires 30-sec rolling averages of power^4
+        let np = Double(avgPower)
+        let intensityFactor = np / Double(ftp)
+        let hours = Double(durationSeconds) / 3600.0
+        
+        return Int(round(hours * pow(intensityFactor, 2) * 100))
+    }
 }
 
 class WorkoutHistoryStore: ObservableObject {
