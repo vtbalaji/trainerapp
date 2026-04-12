@@ -106,12 +106,16 @@ final class BluetoothManager: NSObject, ObservableObject {
     @Published var latestTrainerData: TrainerData = TrainerData()
     @Published var scanAllDevices: Bool = true
 
-    enum TrainerProtocolType {
-        case ftms
-        case tacxFEC
-        case unknown
+    enum TrainerProtocolType: String {
+        case ftms = "FTMS"
+        case tacxFEC = "FE-C"
+        case wahoo = "Wahoo"
+        case unknown = "Unknown"
     }
     @Published var detectedProtocol: TrainerProtocolType = .unknown
+
+    /// Unified trainer service — views use this instead of switching on detectedProtocol
+    @Published var trainerService: (any TrainerProtocol)?
 
     // Heart Rate state
     @Published var hrState: ConnectionState = .disconnected
@@ -132,6 +136,7 @@ final class BluetoothManager: NSObject, ObservableObject {
     @Published var autoConnectScale: Bool = true
     private var controlPointCharacteristic: CBCharacteristic?
     private var tacxWriteCharacteristic: CBCharacteristic?
+    private var wahooControlCharacteristic: CBCharacteristic?
 
     // MARK: - Computed
     var scalePeripheralID: UUID? { scalePeripheral?.identifier }
@@ -281,7 +286,9 @@ final class BluetoothManager: NSObject, ObservableObject {
         trainerPeripheral = nil
         controlPointCharacteristic = nil
         tacxWriteCharacteristic = nil
+        wahooControlCharacteristic = nil
         detectedProtocol = .unknown
+        trainerService = nil
         trainerState = .disconnected
         log("Trainer disconnected")
         updateStatusMessage()
@@ -366,8 +373,18 @@ final class BluetoothManager: NSObject, ObservableObject {
             statusMessage = "Tacx write not available"
             return
         }
-        peripheral.writeValue(data, for: characteristic, type: .withResponse)
+        peripheral.writeValue(data, for: characteristic, type: .withoutResponse)
         log("Sent FE-C: \(data.map { String(format: "%02X", $0) }.joined(separator: " "))")
+    }
+
+    func writeWahooControl(_ data: Data) {
+        guard let peripheral = trainerPeripheral,
+              let characteristic = wahooControlCharacteristic else {
+            statusMessage = "Wahoo control not available"
+            return
+        }
+        peripheral.writeValue(data, for: characteristic, type: .withResponse)
+        log("Sent Wahoo: \(data.map { String(format: "%02X", $0) }.joined(separator: " "))")
     }
 
     // MARK: - Helpers
@@ -544,7 +561,9 @@ extension BluetoothManager: CBCentralManagerDelegate {
                 trainerPeripheral = nil
                 controlPointCharacteristic = nil
                 tacxWriteCharacteristic = nil
+                wahooControlCharacteristic = nil
                 detectedProtocol = .unknown
+                trainerService = nil
                 trainerState = .disconnected
             case .heartRate:
                 hrPeripheral = nil
@@ -581,12 +600,14 @@ extension BluetoothManager: CBPeripheralDelegate {
 
             var foundFTMS = false
             var foundTacxFEC = false
+            var foundWahoo = false
             var foundHR = false
 
             for service in services {
                 log("  Service: \(service.uuid.uuidString)")
                 if service.uuid == FTMSConstants.ftmsServiceUUID { foundFTMS = true }
                 if service.uuid == FTMSConstants.tacxFECServiceUUID { foundTacxFEC = true }
+                if service.uuid == FTMSConstants.cyclingPowerServiceUUID { foundWahoo = true }
                 if service.uuid == FTMSConstants.heartRateServiceUUID { foundHR = true }
             }
 
@@ -594,14 +615,23 @@ extension BluetoothManager: CBPeripheralDelegate {
             if role == .trainer || role == .unknown {
                 if foundFTMS {
                     detectedProtocol = .ftms
+                    trainerService = FTMSTrainerService(bluetooth: self)
                     log("Using FTMS protocol")
                     for service in services where service.uuid == FTMSConstants.ftmsServiceUUID {
                         peripheral.discoverCharacteristics(nil, for: service)
                     }
                 } else if foundTacxFEC {
                     detectedProtocol = .tacxFEC
+                    trainerService = TacxFECTrainerService(bluetooth: self)
                     log("Using Tacx FE-C protocol")
                     for service in services where service.uuid == FTMSConstants.tacxFECServiceUUID {
+                        peripheral.discoverCharacteristics(nil, for: service)
+                    }
+                } else if foundWahoo {
+                    detectedProtocol = .wahoo
+                    trainerService = WahooTrainerService(bluetooth: self)
+                    log("Using Wahoo proprietary protocol")
+                    for service in services where service.uuid == FTMSConstants.cyclingPowerServiceUUID {
                         peripheral.discoverCharacteristics(nil, for: service)
                     }
                 } else {
@@ -708,6 +738,28 @@ extension BluetoothManager: CBPeripheralDelegate {
                 return
             }
 
+            // Wahoo Cycling Power Service
+            if service.uuid == FTMSConstants.cyclingPowerServiceUUID {
+                for c in characteristics {
+                    if c.uuid == FTMSConstants.wahooControlUUID {
+                        wahooControlCharacteristic = c
+                        log("Found: Wahoo control characteristic")
+                    } else if c.uuid == FTMSConstants.cyclingPowerMeasurementUUID {
+                        peripheral.setNotifyValue(true, for: c)
+                        log("Subscribed: Cycling Power Measurement")
+                    } else if c.properties.contains(.notify) {
+                        peripheral.setNotifyValue(true, for: c)
+                        log("Wahoo auto-sub: \(c.uuid.uuidString)")
+                    }
+                }
+                if wahooControlCharacteristic != nil {
+                    trainerState = .ready
+                    log("Trainer ready via Wahoo!")
+                    updateStatusMessage()
+                }
+                return
+            }
+
             // Heart Rate service
             if service.uuid == FTMSConstants.heartRateServiceUUID {
                 for c in characteristics {
@@ -800,6 +852,15 @@ extension BluetoothManager: CBPeripheralDelegate {
                 let page = data.count > 0 ? String(format: "0x%02X", data[data.count >= 13 ? 4 : 0]) : "?"
                 log("FE-C \(page): \(parsed.instantaneousPower)W \(String(format: "%.0f", parsed.instantaneousCadence))rpm [\(hex)]")
 
+            // Cycling Power Measurement (Wahoo KICKR uses this)
+            case FTMSConstants.cyclingPowerMeasurementUUID:
+                let parsed = parseCyclingPower(data)
+                latestTrainerData.instantaneousPower = parsed.power
+                if let cadence = parsed.cadence {
+                    latestTrainerData.instantaneousCadence = cadence
+                }
+                log("CPM: \(parsed.power)W" + (parsed.cadence.map { " \(String(format: "%.0f", $0))rpm" } ?? ""))
+
             // Heart Rate Measurement
             case FTMSConstants.heartRateMeasurementUUID:
                 let hr = parseHeartRate(data)
@@ -867,6 +928,31 @@ extension BluetoothManager: CBPeripheralDelegate {
         return 0
     }
     
+    /// Parse BLE Cycling Power Measurement (0x2A63) — used by Wahoo KICKR
+    @MainActor
+    private func parseCyclingPower(_ data: Data) -> (power: Int16, cadence: Double?) {
+        guard data.count >= 4 else { return (0, nil) }
+        let flags: UInt16 = data.readLE(at: 0)
+        let power: Int16 = data.readLE(at: 2)
+        var offset = 4
+
+        // Bit 0: Pedal Power Balance present (1 byte)
+        if flags & 0x0001 != 0 { offset += 1 }
+        // Bit 2: Accumulated Torque present (2 bytes)
+        if flags & 0x0004 != 0 { offset += 2 }
+        // Bit 4: Wheel Revolution Data present (6 bytes: 4 cumulative + 2 last event)
+        if flags & 0x0010 != 0 { offset += 6 }
+        // Bit 5: Crank Revolution Data present (4 bytes: 2 cumulative + 2 last event)
+        if flags & 0x0020 != 0, data.count >= offset + 4 {
+            let crankRevs: UInt16 = data.readLE(at: offset)
+            let crankEvent: UInt16 = data.readLE(at: offset + 2)
+            // Derive cadence from crank data if we have previous values
+            _ = crankRevs; _ = crankEvent
+            // For now return nil — cadence from crank delta needs stateful tracking
+        }
+        return (power, nil)
+    }
+
     // MARK: - Scale Data
     
     @MainActor
@@ -880,65 +966,72 @@ extension BluetoothManager: CBPeripheralDelegate {
     @MainActor
     private func tryParseScaleData(_ data: Data, from uuid: String) {
         guard data.count >= 8 else { return }
-        
-        // Actofit FFB2 format: XX 07 00 A2 03 18 00 [WW WW] ...
-        // Weight at bytes 7-8 (BIG-ENDIAN, /1000 for kg)
-        if uuid.contains("FFB2") && data.count >= 9 {
-            let weightRaw = (UInt16(data[7]) << 8) | UInt16(data[8])  // Big-endian
-            let weight = Double(weightRaw) / 1000.0
+
+        // Chipsea V2 protocol (Actofit, Crenot, Runstar, OKOK scales)
+        // FFB2: weight notifications during measurement
+        // Format: [counter] 07 00 A2 [mode] XX [WW WW WW] ...
+        // Weight: bytes 6-8 big-endian, only 18 bits valid (& 0x3FFFF), in grams (/1000 for kg)
+        // Mode: data[4] — 0x01=measuring, 0x02=stable/final, 0x03=measuring
+        if uuid.contains("FFB2") && data.count >= 9 && data[3] == 0xA2 {
+            let raw24 = (UInt32(data[6]) << 16) | (UInt32(data[7]) << 8) | UInt32(data[8])
+            let weightGrams = raw24 & 0x3FFFF
+            let weight = Double(weightGrams) / 1000.0
+            let mode = data[4]
+            let isStable = mode == 0x02
+
             if weight > 20 && weight < 200 {
                 scaleData.weight = weight
                 scaleData.timestamp = Date()
-                log("✓ Weight: \(String(format: "%.2f", weight)) kg")
-                updateUserSettingsFromScale()
+                log("\(isStable ? "✓ STABLE" : "~ Measuring") Weight: \(String(format: "%.2f", weight)) kg (mode=\(String(format: "0x%02X", mode)))")
+                if isStable {
+                    updateUserSettingsFromScale()
+                }
             }
         }
-        
-        // Actofit FFB3 body composition packet (header 0x1E 00) - contains weight and body data
-        // 00 1E 00 A3 18 00 [WW WW] 00 [data pairs...]
-        if uuid.contains("FFB3") && data.count >= 18 && data[1] == 0x1E && data[2] == 0x00 {
-            // Weight at bytes 6-7 (BIG-ENDIAN)
-            let weightRaw = (UInt16(data[6]) << 8) | UInt16(data[7])  // Big-endian
-            let weight = Double(weightRaw) / 1000.0
+
+        // FFB3 type A3: BIA completion — final weight + segment body values
+        // Format: 00 1E 00 A3 XX [WW WW WW] 00 [pair1..pair5]
+        // Weight: bytes 5-7 big-endian, 18 bits (& 0x3FFFF), in grams
+        // Segment values: bytes 9-18 as big-endian uint16 pairs / 10
+        if uuid.contains("FFB3") && data.count >= 19 && data[3] == 0xA3 {
+            let raw24 = (UInt32(data[5]) << 16) | (UInt32(data[6]) << 8) | UInt32(data[7])
+            let weightGrams = raw24 & 0x3FFFF
+            let weight = Double(weightGrams) / 1000.0
+
             if weight > 20 && weight < 200 {
                 scaleData.weight = weight
                 scaleData.timestamp = Date()
-                log("✓ Weight: \(String(format: "%.2f", weight)) kg")
+                log("✓ BIA Weight: \(String(format: "%.2f", weight)) kg")
                 updateUserSettingsFromScale()
             }
-            
-            // Body composition values at bytes 9-18 (pairs as BIG-ENDIAN / 10)
-            if data.count >= 19 {
-                let v1 = Double((UInt16(data[9]) << 8) | UInt16(data[10])) / 10.0
-                let v2 = Double((UInt16(data[11]) << 8) | UInt16(data[12])) / 10.0
-                let v3 = Double((UInt16(data[13]) << 8) | UInt16(data[14])) / 10.0
-                let v4 = Double((UInt16(data[15]) << 8) | UInt16(data[16])) / 10.0
-                let v5 = Double((UInt16(data[17]) << 8) | UInt16(data[18])) / 10.0
-                
-                log("Body values: \(String(format: "%.1f %.1f %.1f %.1f %.1f", v1, v2, v3, v4, v5))")
-                
-                // These are likely segment impedances, not final body composition
-                // Actofit calculates final values using these + user profile
+
+            // Segment body values at bytes 9-18
+            var segments: [Double] = []
+            for i in stride(from: 9, to: 19, by: 2) {
+                let v = Double((UInt16(data[i]) << 8) | UInt16(data[i+1])) / 10.0
+                segments.append(v)
             }
+            log("Body segments: \(segments.map { String(format: "%.1f", $0) }.joined(separator: ", "))")
         }
-        
-        // Actofit FFB3 impedance packet (header 0x1E 01) - raw impedance values in ohms
-        if uuid.contains("FFB3") && data.count >= 15 && data[1] == 0x1E && data[2] == 0x01 {
+
+        // FFB3 type 01: raw impedance values in ohms (7 segment pairs)
+        // Format: 00 1E 01 [pair1..pair7]
+        if uuid.contains("FFB3") && data.count >= 17 && data[1] == 0x1E && data[2] == 0x01 {
             var values: [Double] = []
-            for i in stride(from: 3, to: min(data.count - 1, 15), by: 2) {
-                let v = Double((UInt16(data[i]) << 8) | UInt16(data[i+1]))  // No division - raw ohms
+            for i in stride(from: 3, to: 17, by: 2) {
+                let v = Double((UInt16(data[i]) << 8) | UInt16(data[i+1]))
                 values.append(v)
             }
             scaleData.impedances = values
             log("Impedance: \(values.map { String(format: "%.0f", $0) }.joined(separator: ", ")) ohms")
-            
-            // Calculate body composition if we have weight
+
             if scaleData.weight > 0 {
                 let settings = UserSettings.shared
                 scaleData.calculateBodyComposition(
                     height: settings.height,
                     age: settings.age,
-                    gender: settings.gender
+                    gender: settings.gender,
+                    calibrationOffset: settings.scaleCalibrationOffset
                 )
                 log("✓ Body Fat: \(String(format: "%.1f", scaleData.bodyFat))%, Muscle: \(String(format: "%.1f", scaleData.muscleMass))kg, Water: \(String(format: "%.1f", scaleData.waterPercentage))%")
             }

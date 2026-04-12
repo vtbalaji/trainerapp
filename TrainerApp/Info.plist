@@ -19,6 +19,10 @@
 			<true/>
 		</dict>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Take a photo of your food for automatic recognition</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Select a food photo for automatic recognition</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

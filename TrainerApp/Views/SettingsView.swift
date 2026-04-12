@@ -10,7 +10,6 @@ struct SettingsView: View {
     @State private var showDevices = false
     @StateObject private var userSettings = UserSettings.shared
     @StateObject private var strava = StravaService.shared
-    
     var body: some View {
         NavigationStack {
             List {
@@ -141,13 +140,14 @@ struct SettingsView: View {
                         Text("cm")
                             .foregroundStyle(.secondary)
                     }
+                    DatePicker("Date of Birth",
+                              selection: $userSettings.dateOfBirth,
+                              in: ...Date(),
+                              displayedComponents: .date)
                     HStack {
                         Text("Age")
                         Spacer()
-                        TextField("Age", value: $userSettings.age, format: .number)
-                            .multilineTextAlignment(.trailing)
-                            .frame(width: 80)
-                        Text("years")
+                        Text("\(userSettings.age) years")
                             .foregroundStyle(.secondary)
                     }
                     Picker("Gender", selection: $userSettings.gender) {
@@ -245,11 +245,7 @@ struct SettingsView: View {
     }
 
     private var protocolLabel: String {
-        switch bluetooth.detectedProtocol {
-        case .ftms: "FTMS"
-        case .tacxFEC: "Tacx FE-C"
-        case .unknown: "Unknown"
-        }
+        bluetooth.detectedProtocol.rawValue
     }
 
     private func startRename(_ device: SavedDevice) {

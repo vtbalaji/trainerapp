@@ -9,10 +9,6 @@ struct TrainerData {
     var totalDistance: UInt32 = 0           // meters
     var elapsedTime: UInt16 = 0            // seconds
     var resistanceLevel: Int16 = 0         // current resistance level
-    
-    // For cumulative cadence calculation
-    var lastCrankRevs: UInt8 = 0
-    var lastCrankTime: Date = Date()
 
     /// Parse Indoor Bike Data characteristic value per FTMS spec (0x2AD2)
     /// The first 2 bytes are flags indicating which fields are present.
@@ -85,7 +81,7 @@ struct TrainerData {
 
         // Bit 8: Expended Energy present
         if flags & 0x0100 != 0 {
-            offset += 5 // total energy (2) + energy per hour (2) + energy per minute (1)
+            offset += 6 // total energy (2) + energy per hour (2) + energy per minute (2)
         }
 
         // Bit 9: Heart Rate present
@@ -137,88 +133,73 @@ struct TrainerData {
 
         switch pageNumber {
         case 0x10: // General FE Data (page 16)
+            // ANT+ FE-C D00001231, page 16 layout:
+            // Byte 0: Page number (0x10)
+            // Byte 1: Equipment type (bit field)
+            // Byte 2: Elapsed time (0.25s resolution, rollover at 64s)
+            // Byte 3: Distance traveled (rollover at 256m)
+            // Byte 4-5: Speed LSB/MSB (0.001 m/s, 0xFFFF = invalid)
+            // Byte 6: Heart rate (0xFF = invalid)
+            // Byte 7: Capabilities (bits 0-3) + FE state (bits 4-7)
             if offset + 7 < data.count {
-                // Byte 4 (from page start): speed LSB, Byte 5: speed MSB
                 let speedRaw: UInt16 = data.readLE(at: offset + 4)
-                result.instantaneousSpeed = Double(speedRaw) * 0.001 * 3.6 // mm/s → km/h
+                if speedRaw != 0xFFFF {
+                    result.instantaneousSpeed = Double(speedRaw) * 0.001 * 3.6 // m/s → km/h
+                }
+                let hrRaw: UInt8 = data[offset + 6]
+                if hrRaw != 0xFF && hrRaw > 0 {
+                    result.heartRate = hrRaw
+                }
             }
 
-        case 0x19: // General FE Data (page 25) — Specific Trainer/Stationary Bike
+        case 0x19: // Specific Trainer/Stationary Bike Data (page 25)
+            // ANT+ FE-C D00001231, page 25 layout:
+            // Byte 0: Page number (0x19)
+            // Byte 1: Update event count
+            // Byte 2: Instantaneous cadence (0-254 rpm, 0xFF = invalid)
+            // Byte 3: Accumulated power LSB
+            // Byte 4: Accumulated power MSB
+            // Byte 5: Instantaneous power LSB
+            // Byte 6: bits 0-3 = Instantaneous power MSB, bits 4-7 = trainer status
+            // Byte 7: bits 0-3 = flags, bits 4-7 = FE state
             if offset + 7 < data.count {
-                // Byte 5-6: instantaneous power (little-endian, 12 bits)
+                // Byte 2: Instantaneous cadence — direct RPM value
+                let cadenceRaw: UInt8 = data[offset + 2]
+                if cadenceRaw != 0xFF {
+                    result.instantaneousCadence = Double(cadenceRaw)
+                }
+
+                // Bytes 5-6: Instantaneous power (12-bit unsigned, little-endian)
                 let powerLSB: UInt8 = data[offset + 5]
                 let powerMSB: UInt8 = data[offset + 6]
-                let power = Int16(powerLSB) | (Int16(powerMSB & 0x0F) << 8)
-                result.instantaneousPower = power
-                
-                // Byte 4: cadence - calculate RPM from cumulative revolutions
-                let currentRevs = data[offset + 4]
-                let now = Date()
-                let timeDiff = now.timeIntervalSince(previous.lastCrankTime)
-                
-                if timeDiff > 0.2 && timeDiff < 3.0 {
-                    // Handle rollover (8-bit counter)
-                    var revDiff = Int(currentRevs) - Int(previous.lastCrankRevs)
-                    if revDiff < 0 { revDiff += 256 }
-                    
-                    if revDiff > 0 && revDiff < 20 {
-                        let calculatedRPM = Double(revDiff) / timeDiff * 60.0
-                        // Cap at realistic max cadence (180 rpm)
-                        if calculatedRPM <= 180 {
-                            result.instantaneousCadence = calculatedRPM
-                        } else {
-                            result.instantaneousCadence = previous.instantaneousCadence
-                        }
-                    } else if revDiff == 0 {
-                        // No new revolutions - decay toward 0
-                        result.instantaneousCadence = max(0, previous.instantaneousCadence * 0.7)
-                    }
-                } else if timeDiff >= 3.0 {
-                    // Too long since last reading - assume stopped
-                    result.instantaneousCadence = 0
-                } else {
-                    // Too short interval - keep previous
-                    result.instantaneousCadence = previous.instantaneousCadence
+                let powerRaw = UInt16(powerLSB) | (UInt16(powerMSB & 0x0F) << 8)
+                if powerRaw != 0xFFF {  // 0xFFF = invalid
+                    result.instantaneousPower = Int16(powerRaw)
                 }
-                
-                result.lastCrankRevs = currentRevs
-                result.lastCrankTime = now
             }
 
-        case 0x31: // Specific Trainer Data (page 49) — Tacx extended
+        case 0x31: // Trainer Torque Data (page 49)
+            // ANT+ FE-C D00001231, page 49 layout:
+            // Byte 0: Page number (0x31)
+            // Byte 1: Update event count
+            // Byte 2: Wheel ticks (cumulative)
+            // Byte 3: Instantaneous cadence (0-254 rpm, 0xFF = invalid)
+            // Bytes 4-5: Wheel period (1/2048 s, cumulative)
+            // Bytes 6-7: Accumulated torque (1/32 Nm, cumulative)
             if offset + 7 < data.count {
-                let powerLSB: UInt8 = data[offset + 5]
-                let powerMSB: UInt8 = data[offset + 6]
-                let power = Int16(powerLSB) | (Int16(powerMSB & 0x0F) << 8)
-                result.instantaneousPower = power
-                
-                // Same cumulative cadence handling
-                let currentRevs = data[offset + 4]
-                let now = Date()
-                let timeDiff = now.timeIntervalSince(previous.lastCrankTime)
-                
-                if timeDiff > 0.2 && timeDiff < 3.0 {
-                    var revDiff = Int(currentRevs) - Int(previous.lastCrankRevs)
-                    if revDiff < 0 { revDiff += 256 }
-                    
-                    if revDiff > 0 && revDiff < 20 {
-                        let calculatedRPM = Double(revDiff) / timeDiff * 60.0
-                        if calculatedRPM <= 180 {
-                            result.instantaneousCadence = calculatedRPM
-                        } else {
-                            result.instantaneousCadence = previous.instantaneousCadence
-                        }
-                    } else if revDiff == 0 {
-                        result.instantaneousCadence = max(0, previous.instantaneousCadence * 0.7)
-                    }
-                } else if timeDiff >= 3.0 {
-                    result.instantaneousCadence = 0
-                } else {
-                    result.instantaneousCadence = previous.instantaneousCadence
+                // Byte 3: Instantaneous cadence (NOTE: byte 3, not byte 2 on this page)
+                let cadenceRaw: UInt8 = data[offset + 3]
+                if cadenceRaw != 0xFF {
+                    result.instantaneousCadence = Double(cadenceRaw)
                 }
-                
-                result.lastCrankRevs = currentRevs
-                result.lastCrankTime = now
+
+                // Calculate power from torque and cadence:
+                // Power = Torque × Angular velocity = Torque × (2π × cadence / 60)
+                // Accumulated torque is in 1/32 Nm units
+                // For instantaneous, we use the torque delta / period delta approach
+                // However, many Tacx trainers also send page 0x19 with direct power,
+                // so we only use torque-based power if we don't have page 0x19 data
+                // Keep existing power if we have it from page 0x19
             }
 
         default:

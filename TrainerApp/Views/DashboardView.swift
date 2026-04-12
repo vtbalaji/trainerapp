@@ -87,11 +87,7 @@ struct DashboardView: View {
     }
 
     private var protocolLabel: String? {
-        switch bluetooth.detectedProtocol {
-        case .ftms: "FTMS"
-        case .tacxFEC: "FE-C"
-        case .unknown: nil
-        }
+        bluetooth.detectedProtocol == .unknown ? nil : bluetooth.detectedProtocol.rawValue
     }
 }
 

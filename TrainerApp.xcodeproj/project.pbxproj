@@ -29,11 +29,15 @@
 		A1000022 /* AppIcon-40@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B1000022; };
 		A1000023 /* AppIcon-40@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = B1000023; };
 		A1000012 /* TacxFECTrainerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000012 /* TacxFECTrainerService.swift */; };
+		A1000060 /* WahooTrainerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000060 /* WahooTrainerService.swift */; };
 		A1000013 /* ControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000013 /* ControlView.swift */; };
 		A1000024 /* WorkoutPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000024 /* WorkoutPlan.swift */; };
 		A1000025 /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000025 /* UserSettings.swift */; };
 		A1000049 /* ScaleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000049 /* ScaleData.swift */; };
 		A1000050 /* ScaleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000050 /* ScaleView.swift */; };
+		A1000051 /* TrainingPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000051 /* TrainingPlan.swift */; };
+		A1000052 /* TrainingPlanGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000052 /* TrainingPlanGenerator.swift */; };
+		A1000053 /* TrainingPlanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000053 /* TrainingPlanView.swift */; };
 		A1000026 /* WorkoutsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000026 /* WorkoutsView.swift */; };
 		A1000027 /* endurance_1hr.zwo in Resources */ = {isa = PBXBuildFile; fileRef = B1000027 /* endurance_1hr.zwo */; };
 		A1000028 /* sweet_spot_3x10.zwo in Resources */ = {isa = PBXBuildFile; fileRef = B1000028 /* sweet_spot_3x10.zwo */; };
@@ -57,6 +61,9 @@
 		A1000035 /* StravaService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000035 /* StravaService.swift */; };
 		A1000036 /* StravaAuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000036 /* StravaAuthView.swift */; };
 		A1000047 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000047 /* Config.swift */; };
+		A1000054 /* DietQualityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000054 /* DietQualityView.swift */; };
+		A1000055 /* DietQuality.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000055 /* DietQuality.swift */; };
+		A1000056 /* FoodRecognitionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000056 /* FoodRecognitionService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -72,6 +79,7 @@
 		B1000010 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		B1000011 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B1000012 /* TacxFECTrainerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TacxFECTrainerService.swift; sourceTree = "<group>"; };
+		B1000060 /* WahooTrainerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WahooTrainerService.swift; sourceTree = "<group>"; };
 		B1000013 /* ControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlView.swift; sourceTree = "<group>"; };
 		B1000014 /* AppIcon60x60@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon60x60@2x.png"; sourceTree = "<group>"; };
 		B1000015 /* AppIcon60x60@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon60x60@3x.png"; sourceTree = "<group>"; };
@@ -88,6 +96,9 @@
 		B1000025 /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
 		B1000049 /* ScaleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScaleData.swift; sourceTree = "<group>"; };
 		B1000050 /* ScaleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScaleView.swift; sourceTree = "<group>"; };
+		B1000051 /* TrainingPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlan.swift; sourceTree = "<group>"; };
+		B1000052 /* TrainingPlanGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlanGenerator.swift; sourceTree = "<group>"; };
+		B1000053 /* TrainingPlanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlanView.swift; sourceTree = "<group>"; };
 		B1000026 /* WorkoutsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutsView.swift; sourceTree = "<group>"; };
 		B1000027 /* endurance_1hr.zwo */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = endurance_1hr.zwo; sourceTree = "<group>"; };
 		B1000028 /* sweet_spot_3x10.zwo */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = sweet_spot_3x10.zwo; sourceTree = "<group>"; };
@@ -111,6 +122,9 @@
 		B1000034 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		B1000035 /* StravaService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StravaService.swift; sourceTree = "<group>"; };
 		B1000036 /* StravaAuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StravaAuthView.swift; sourceTree = "<group>"; };
+		B1000054 /* DietQualityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DietQualityView.swift; sourceTree = "<group>"; };
+		B1000055 /* DietQuality.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DietQuality.swift; sourceTree = "<group>"; };
+		B1000056 /* FoodRecognitionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodRecognitionService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -188,7 +202,9 @@
 				B1000024 /* WorkoutPlan.swift */,
 				B1000025 /* UserSettings.swift */,
 				B1000049 /* ScaleData.swift */,
+				B1000051 /* TrainingPlan.swift */,
 				B1000033 /* WorkoutSession.swift */,
+				B1000055 /* DietQuality.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -200,7 +216,10 @@
 				B1000007 /* TrainerProtocol.swift */,
 				B1000008 /* FTMSTrainerService.swift */,
 				B1000012 /* TacxFECTrainerService.swift */,
+				B1000060 /* WahooTrainerService.swift */,
 				B1000035 /* StravaService.swift */,
+				B1000052 /* TrainingPlanGenerator.swift */,
+				B1000056 /* FoodRecognitionService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -212,11 +231,13 @@
 				B1000003 /* DashboardView.swift */,
 				B1000010 /* SettingsView.swift */,
 				B1000050 /* ScaleView.swift */,
+				B1000053 /* TrainingPlanView.swift */,
 				B1000013 /* ControlView.swift */,
 				B1000026 /* WorkoutsView.swift */,
 				B1000032 /* WorkoutExecutionView.swift */,
 				B1000034 /* HistoryView.swift */,
 				B1000036 /* StravaAuthView.swift */,
+				B1000054 /* DietQualityView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -339,17 +360,24 @@
 				A1000010 /* SettingsView.swift in Sources */,
 				A1000050 /* ScaleView.swift in Sources */,
 				A1000012 /* TacxFECTrainerService.swift in Sources */,
+				A1000060 /* WahooTrainerService.swift in Sources */,
 				A1000013 /* ControlView.swift in Sources */,
 				A1000024 /* WorkoutPlan.swift in Sources */,
 				A1000025 /* UserSettings.swift in Sources */,
 				A1000049 /* ScaleData.swift in Sources */,
+				A1000051 /* TrainingPlan.swift in Sources */,
+				A1000052 /* TrainingPlanGenerator.swift in Sources */,
+				A1000053 /* TrainingPlanView.swift in Sources */,
 				A1000026 /* WorkoutsView.swift in Sources */,
 				A1000032 /* WorkoutExecutionView.swift in Sources */,
 				A1000033 /* WorkoutSession.swift in Sources */,
 				A1000034 /* HistoryView.swift in Sources */,
+				A1000054 /* DietQualityView.swift in Sources */,
+				A1000055 /* DietQuality.swift in Sources */,
 				A1000035 /* StravaService.swift in Sources */,
 				A1000036 /* StravaAuthView.swift in Sources */,
 				A1000047 /* Config.swift in Sources */,
+				A1000056 /* FoodRecognitionService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -20,14 +20,24 @@ class UserSettings: ObservableObject {
         didSet { UserDefaults.standard.set(height, forKey: "userHeight") }
     }
     
-    @Published var age: Int {
-        didSet { UserDefaults.standard.set(age, forKey: "userAge") }
+    @Published var dateOfBirth: Date {
+        didSet { UserDefaults.standard.set(dateOfBirth, forKey: "userDOB") }
+    }
+
+    var age: Int {
+        Calendar.current.dateComponents([.year], from: dateOfBirth, to: Date()).year ?? 30
     }
     
     @Published var gender: Gender {
         didSet { UserDefaults.standard.set(gender.rawValue, forKey: "userGender") }
     }
     
+    /// FFM calibration offset — added to the FFM formula constant
+    /// Positive = more lean mass (lower body fat), Negative = less lean mass (higher body fat)
+    @Published var scaleCalibrationOffset: Double {
+        didSet { UserDefaults.standard.set(scaleCalibrationOffset, forKey: "scaleCalibrationOffset") }
+    }
+
     @Published var vo2max: Double {
         didSet { UserDefaults.standard.set(vo2max, forKey: "userVO2max") }
     }
@@ -50,12 +60,21 @@ class UserSettings: ObservableObject {
         let storedHeight = UserDefaults.standard.double(forKey: "userHeight")
         self.height = storedHeight > 0 ? storedHeight : 170.0
         
-        let storedAge = UserDefaults.standard.integer(forKey: "userAge")
-        self.age = storedAge > 0 ? storedAge : 30
+        if let storedDOB = UserDefaults.standard.object(forKey: "userDOB") as? Date {
+            self.dateOfBirth = storedDOB
+        } else {
+            // Default: June 15, 1975
+            var components = DateComponents()
+            components.year = 1975
+            components.month = 6
+            components.day = 15
+            self.dateOfBirth = Calendar.current.date(from: components) ?? Date()
+        }
         
         let storedGender = UserDefaults.standard.string(forKey: "userGender") ?? "Male"
         self.gender = Gender(rawValue: storedGender) ?? .male
         
+        self.scaleCalibrationOffset = UserDefaults.standard.double(forKey: "scaleCalibrationOffset")
         self.vo2max = UserDefaults.standard.double(forKey: "userVO2max")
         self.vo2maxDate = UserDefaults.standard.object(forKey: "userVO2maxDate") as? Date
     }

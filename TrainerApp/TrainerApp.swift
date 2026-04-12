@@ -2,19 +2,23 @@ import SwiftUI
 
 enum AppTab: String, CaseIterable {
     case workouts = "Workouts"
+    case trainingPlan = "Training Plan"
     case dashboard = "Dashboard"
     case control = "Control"
     case history = "History"
     case scale = "Scale"
+    case dietQuality = "Diet Quality"
     case settings = "Settings"
 
     var icon: String {
         switch self {
         case .workouts: "figure.indoor.cycle"
+        case .trainingPlan: "calendar"
         case .dashboard: "gauge.with.dots.needle.bottom.50percent"
         case .control: "slider.horizontal.3"
         case .history: "clock.arrow.circlepath"
         case .scale: "scalemass.fill"
+        case .dietQuality: "fork.knife"
         case .settings: "gearshape"
         }
     }
@@ -64,10 +68,16 @@ struct TrainerApp: App {
                             ControlView()
                         case .workouts:
                             WorkoutsView()
+                        case .trainingPlan:
+                            NavigationStack {
+                                TrainingPlanView()
+                            }
                         case .history:
                             HistoryView()
                         case .scale:
                             ScaleView()
+                        case .dietQuality:
+                            DietQualityView()
                         case .settings:
                             SettingsView()
                         }
@@ -96,12 +106,7 @@ struct TrainerApp: App {
             .environmentObject(trainerStore)
             .onChange(of: bluetooth.trainerState) { _, newState in
                 if newState == .ready, let id = bluetooth.trainerPeripheralID {
-                    let protocolStr: String
-                    switch bluetooth.detectedProtocol {
-                    case .ftms: protocolStr = "ftms"
-                    case .tacxFEC: protocolStr = "tacxFEC"
-                    case .unknown: protocolStr = "unknown"
-                    }
+                    let protocolStr = bluetooth.detectedProtocol.rawValue
                     let device = SavedDevice(
                         id: id,
                         name: bluetooth.trainerPeripheralName ?? "Unknown",

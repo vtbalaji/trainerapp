@@ -29,8 +29,9 @@ enum WorkoutCategory: String, CaseIterable {
     case threshold = "Threshold"
     case vo2max = "VO2max"
     case sprint = "Sprint"
+    case microBurst = "Micro Burst"
     case test = "Test"
-    
+
     var icon: String {
         switch self {
         case .recovery: return "leaf.fill"
@@ -39,6 +40,7 @@ enum WorkoutCategory: String, CaseIterable {
         case .threshold: return "flame.fill"
         case .vo2max: return "bolt.heart.fill"
         case .sprint: return "hare.fill"
+        case .microBurst: return "bolt.fill"
         case .test: return "chart.bar.fill"
         }
     }
@@ -91,15 +93,9 @@ struct WorkoutPlan: Identifiable {
         return "\(mins) min"
     }
     
-    /// Estimated TSS if workout is completed as planned
+    /// Estimated TSS using Normalized Power (NP) calculation
     var estimatedTSS: Int {
-        var tss: Double = 0
-        for interval in intervals {
-            let hours = Double(interval.durationSeconds) / 3600.0
-            let intensityFactor = interval.powerFraction
-            tss += hours * pow(intensityFactor, 2) * 100
-        }
-        return Int(round(tss))
+        TrainingPlanGenerator.tssFromIntervals(intervals)
     }
     
     /// Average Intensity Factor (weighted by duration)
@@ -208,11 +204,11 @@ class ShorthandParser {
                 continue
             }
             
-            // Check for repeat block [...]xN
+            // Check for repeat block [...]xN (supports nesting)
             if cleaned[i] == "[" {
-                guard let closeBracket = cleaned[i...].firstIndex(of: "]") else { return nil }
+                guard let closeBracket = findMatchingBracket(in: cleaned, from: i) else { return nil }
                 let blockContent = String(cleaned[cleaned.index(after: i)..<closeBracket])
-                
+
                 // Find repeat count
                 var repeatCount = 1
                 var afterBracket = cleaned.index(after: closeBracket)
@@ -229,9 +225,9 @@ class ShorthandParser {
                 } else {
                     i = afterBracket
                 }
-                
-                // Parse block content
-                guard let blockIntervals = parseBlock(blockContent) else { return nil }
+
+                // Parse block content recursively (handles nested brackets)
+                guard let blockIntervals = parse(blockContent) else { return nil }
                 for _ in 0..<repeatCount {
                     intervals.append(contentsOf: blockIntervals)
                 }
@@ -246,6 +242,21 @@ class ShorthandParser {
         return intervals.isEmpty ? nil : intervals
     }
     
+    /// Find the matching closing bracket, accounting for nesting
+    private static func findMatchingBracket(in str: String, from openIndex: String.Index) -> String.Index? {
+        var depth = 0
+        var idx = openIndex
+        while idx < str.endIndex {
+            if str[idx] == "[" { depth += 1 }
+            else if str[idx] == "]" {
+                depth -= 1
+                if depth == 0 { return idx }
+            }
+            idx = str.index(after: idx)
+        }
+        return nil
+    }
+
     private static func parseBlock(_ block: String) -> [WorkoutInterval]? {
         var intervals: [WorkoutInterval] = []
         var i = block.startIndex

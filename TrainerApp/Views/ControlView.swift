@@ -32,13 +32,6 @@ struct ControlView: View {
     @State private var resistance: Double = 50
     @State private var isActive = false
 
-    private var trainerService: TacxFECTrainerService {
-        TacxFECTrainerService(bluetooth: bluetooth)
-    }
-
-    private var ftmsService: FTMSTrainerService {
-        FTMSTrainerService(bluetooth: bluetooth)
-    }
 
     var body: some View {
         VStack(spacing: 16) {
@@ -122,50 +115,22 @@ struct ControlView: View {
 
     private func sendERG() {
         let watts = Int16(targetPower)
-        switch bluetooth.detectedProtocol {
-        case .tacxFEC:
-            trainerService.setTargetPower(watts: watts)
-        case .ftms:
-            ftmsService.setTargetPower(watts: watts)
-        case .unknown:
-            bluetooth.log("Unknown protocol — can't set power")
-        }
+        bluetooth.trainerService?.setTargetPower(watts: watts)
         isActive = true
     }
 
     private func sendSimulation() {
-        switch bluetooth.detectedProtocol {
-        case .tacxFEC:
-            trainerService.setSimulationParameters(grade: grade, windSpeed: 0, rollingResistance: 0.004, windResistance: 0.51)
-        case .ftms:
-            ftmsService.setSimulationParameters(grade: grade, windSpeed: 0, rollingResistance: 0.004, windResistance: 0.51)
-        case .unknown:
-            bluetooth.log("Unknown protocol — can't set simulation")
-        }
+        bluetooth.trainerService?.setSimulationParameters(grade: grade, windSpeed: 0, rollingResistance: 0.004, windResistance: 0.51)
         isActive = true
     }
 
     private func sendResistance() {
-        switch bluetooth.detectedProtocol {
-        case .tacxFEC:
-            trainerService.setResistanceLevel(percent: resistance)
-        case .ftms:
-            ftmsService.setResistanceLevel(percent: resistance)
-        case .unknown:
-            bluetooth.log("Unknown protocol — can't set resistance")
-        }
+        bluetooth.trainerService?.setResistanceLevel(percent: resistance)
         isActive = true
     }
 
     private func stopTrainer() {
-        switch bluetooth.detectedProtocol {
-        case .tacxFEC:
-            trainerService.setTargetPower(watts: 0)
-        case .ftms:
-            ftmsService.setTargetPower(watts: 0)
-        case .unknown:
-            break
-        }
+        bluetooth.trainerService?.setTargetPower(watts: 0)
         isActive = false
     }
 }

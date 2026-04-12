@@ -27,6 +27,12 @@ enum FTMSConstants {
     /// Read: which features the trainer supports
     static let fitnessMachineFeatureUUID = CBUUID(string: "2ACC")
 
+    // MARK: - Wahoo KICKR Proprietary
+    /// Wahoo uses the Cycling Power Service (0x1818) with a proprietary control characteristic
+    static let cyclingPowerServiceUUID = CBUUID(string: "1818")
+    static let cyclingPowerMeasurementUUID = CBUUID(string: "2A63")
+    static let wahooControlUUID = CBUUID(string: "A026E005-0A7D-4AB3-97FA-F1500F9FEB8B")
+
     // MARK: - Heart Rate Service (standard BLE)
     static let heartRateServiceUUID = CBUUID(string: "180D")
     /// Heart Rate Measurement characteristic — notify

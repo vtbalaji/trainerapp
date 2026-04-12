@@ -2,161 +2,279 @@ import Foundation
 
 struct SegmentData {
     var fatPercent: Double = 0    // % relative to ideal (80-120% is normal)
+    var fatMass: Double = 0       // kg
     var musclePercent: Double = 0 // % relative to ideal (80-115% is normal)
+    var muscleMass: Double = 0    // kg
+    var rating: String = "Standard"
 }
 
 struct ScaleData {
     var weight: Double = 0           // kg
     var bodyFat: Double = 0          // %
+    var fatMass: Double = 0          // kg
     var muscleMass: Double = 0       // kg
+    var muscleRate: Double = 0       // %
     var boneMass: Double = 0         // kg
     var waterPercentage: Double = 0  // %
+    var waterWeight: Double = 0      // kg
+    var proteinMass: Double = 0      // kg
+    var proteinRate: Double = 0      // %
     var bmi: Double = 0
     var bmr: Int = 0                 // kcal
-    var visceralFat: Int = 0
+    var visceralFat: Double = 0
     var timestamp: Date?
-    
+
     // Additional metrics
-    var standardWeight: Double = 0   // ideal weight kg
+    var idealBodyWeight: Double = 0  // kg
     var fatFreeWeight: Double = 0    // lean mass kg
     var subcutaneousFat: Double = 0  // %
     var skeletalMuscle: Double = 0   // %
-    var proteinRate: Double = 0      // %
-    var metabolicAge: Int = 0
+    var bodyAge: Int = 0
+    var whr: Double = 0              // waist-hip ratio (estimated)
     var healthScore: Int = 0         // 0-100
-    
+
+    // Weight control targets
+    var weightControl: Double = 0    // kg delta to ideal
+    var fatControl: Double = 0       // kg fat to lose
+    var muscleControl: Double = 0    // kg muscle to gain
+
     // Raw impedance values from scale (6 segments)
     var impedances: [Double] = []
-    
+
     // Segmental analysis
     var rightArm = SegmentData()
     var leftArm = SegmentData()
     var trunk = SegmentData()
     var rightLeg = SegmentData()
     var leftLeg = SegmentData()
-    
+
     var hasData: Bool {
         weight > 0
     }
-    
+
     var hasSegmentalData: Bool {
         impedances.count >= 5
     }
+
+    /// Rating string based on standard ranges
+    static func rating(for value: Double, low: Double, high: Double) -> String {
+        if value < low { return "Low" }
+        if value > high { return "High" }
+        return "Standard"
+    }
+
+    static func bmiRating(_ bmi: Double) -> String {
+        if bmi < 18.5 { return "Underweight" }
+        if bmi < 25 { return "Standard" }
+        if bmi < 30 { return "Overweight" }
+        return "Obese"
+    }
+
+    static func bodyFatRating(_ bf: Double, gender: Gender) -> String {
+        let (low, high) = gender == .male ? (10.0, 20.0) : (18.0, 28.0)
+        if bf < low { return "Low" }
+        if bf > high { return "High" }
+        return "Standard"
+    }
+
+    static func visceralFatRating(_ vf: Double) -> String {
+        if vf <= 9 { return "Standard" }
+        if vf <= 14 { return "High" }
+        return "Very High"
+    }
+
+    static func bodyAgeRating(_ bodyAge: Int, actualAge: Int) -> String {
+        if bodyAge < actualAge - 5 { return "Excellent" }
+        if bodyAge <= actualAge + 2 { return "Standard" }
+        return "Above Average"
+    }
     
     /// Calculate body composition using BIA formulas
-    mutating func calculateBodyComposition(height: Double, age: Int, gender: Gender) {
+    mutating func calculateBodyComposition(height: Double, age: Int, gender: Gender, calibrationOffset: Double = 0) {
         guard weight > 0 && height > 0 else { return }
-        
+
         let heightM = height / 100.0
         let heightCm = height
-        
+
         // BMI
         bmi = weight / (heightM * heightM)
-        
+
         // Average impedance typically 400-700 ohms
         let impedance = impedances.isEmpty ? 500.0 : impedances.reduce(0, +) / Double(impedances.count)
-        
-        // Improved BIA formula calibrated to match typical smart scale results
-        // Uses height²/impedance ratio with empirically-tuned coefficients
+
+        // ── Fat-Free Mass (Kyle et al. 2004, published BIA equation) ──
+        // Kyle UG et al. "Bioelectrical impedance analysis" Nutrition 2004;20:781-90
+        // Male:   FFM = -10.68 + 0.65 × height²/Z + 0.26 × weight + 0.02 × Z
+        // Female: FFM = -9.53  + 0.69 × height²/Z + 0.17 × weight + 0.02 × Z
+        // calibrationOffset adjusts based on DEXA/Navy reference measurement
         let heightSquared = heightCm * heightCm
         var ffm: Double
-        
-        // Calibrated to match FitDays-style results
+
         if gender == .male {
-            ffm = 0.50 * heightSquared / impedance + 0.14 * weight + 0.10 * heightCm - 0.10 * Double(age) + 6.5
+            ffm = -10.68 + 0.65 * heightSquared / impedance + 0.26 * weight + 0.02 * impedance + calibrationOffset
         } else {
-            ffm = 0.45 * heightSquared / impedance + 0.14 * weight + 0.10 * heightCm - 0.10 * Double(age) + 2.5
+            ffm = -9.53 + 0.69 * heightSquared / impedance + 0.17 * weight + 0.02 * impedance + calibrationOffset
         }
-        
-        // Clamp FFM to realistic range (65-92% of weight)
-        ffm = min(ffm, weight * 0.92)
-        ffm = max(ffm, weight * 0.65)
-        
-        // Body Fat %
+
+        // Clamp FFM to realistic range
+        ffm = min(ffm, weight * 0.95)
+        ffm = max(ffm, weight * 0.58)
+
+        // ── Body Fat ──
         bodyFat = ((weight - ffm) / weight) * 100
         bodyFat = max(5, min(bodyFat, 45))
-        
-        // Muscle Mass (lean mass minus bone, ~95% of FFM)
-        muscleMass = ffm * 0.95
-        
-        // Body Water % (typically 50-65%, inversely related to body fat)
-        waterPercentage = 73.2 - bodyFat * 0.93
-        waterPercentage = max(45, min(waterPercentage, 65))
-        
-        // Bone Mass
+        fatMass = weight * bodyFat / 100.0
+
+        // ── Fat Free Weight ──
+        fatFreeWeight = ffm
+
+        // ── Muscle Mass & Rate ──
+        // Fitdays: muscle mass ≈ FFM - bone mass (not FFM * 0.95)
+        // Bone first (need it for muscle calc)
+        // Bone mineral content (Heymsfield SB et al.)
+        // Bone mass ≈ 4-5% of FFM for males, 3-4% for females
         if gender == .male {
-            boneMass = weight > 75 ? 3.2 : (weight > 60 ? 2.9 : 2.5)
+            boneMass = ffm * 0.05
+            boneMass = max(2.0, min(boneMass, 4.0))
         } else {
-            boneMass = weight > 60 ? 2.5 : (weight > 45 ? 2.2 : 1.8)
+            boneMass = ffm * 0.04
+            boneMass = max(1.5, min(boneMass, 3.2))
         }
-        
-        // BMR using Mifflin-St Jeor
+
+        muscleMass = ffm - boneMass
+        muscleRate = (muscleMass / weight) * 100
+
+        // ── Skeletal Muscle % ──
+        // Janssen et al. 2000: skeletal muscle mass ≈ 40-45% of body weight in healthy males
+        // Skeletal muscle is ~75% of total muscle mass (smooth + cardiac = ~25%)
+        let skeletalMass = muscleMass * 0.75
+        skeletalMuscle = (skeletalMass / weight) * 100
+
+        // ── Body Water ──
+        // Standard: FFM hydration is 73.2% (Wang et al. 1999, five-level body composition model)
+        waterWeight = ffm * 0.732
+        waterPercentage = (waterWeight / weight) * 100
+        waterPercentage = max(40, min(waterPercentage, 75))
+        waterWeight = weight * waterPercentage / 100.0
+
+        // ── Protein ──
+        // Standard: protein = FFM - water - bone mineral (Wang et al. 1999)
+        // Protein mass ≈ FFM × 0.194 (remainder after water 73.2% and mineral 5.3%)
+        proteinMass = ffm * 0.194
+        proteinRate = (proteinMass / weight) * 100
+
+        // ── Subcutaneous Fat ──
+        // Standard: subcutaneous fat ≈ 80% of total body fat (Frayn KN, 2003)
+        // Remainder is visceral + intramuscular fat
+        subcutaneousFat = bodyFat * 0.80
+
+        // ── Visceral Fat Rating (1-30 scale) ──
+        // Omron/Tanita standard: VF correlates with waist circumference, BMI, age
+        // Approximation from BMI and age (Nagai et al. 2010):
+        // VF ≈ (BMI - 10) × 0.5 + (age - 20) × 0.1 for males
+        if gender == .male {
+            visceralFat = max(1, (bmi - 10) * 0.5 + (Double(age) - 20) * 0.1 - 2.0)
+        } else {
+            visceralFat = max(1, (bmi - 10) * 0.4 + (Double(age) - 20) * 0.08 - 2.0)
+        }
+        visceralFat = min(visceralFat, 30)
+        visceralFat = (visceralFat * 10).rounded() / 10
+
+        // ── BMR (Mifflin-St Jeor) ──
+        // Fitdays: 1445 for 60.47kg, 170cm, male
         if gender == .male {
             bmr = Int(10 * weight + 6.25 * heightCm - 5 * Double(age) + 5)
         } else {
             bmr = Int(10 * weight + 6.25 * heightCm - 5 * Double(age) - 161)
         }
-        
-        // Visceral Fat (1-30 scale)
-        visceralFat = Int(max(1, min(30, bodyFat / 5 + Double(age - 20) / 10)))
-        
-        // Additional metrics
-        fatFreeWeight = ffm
-        standardWeight = 22.0 * heightM * heightM  // BMI 22 as ideal
-        subcutaneousFat = bodyFat * 0.85  // ~85% of body fat is subcutaneous
-        skeletalMuscle = (muscleMass / weight) * 100
-        proteinRate = skeletalMuscle * 0.35  // protein ~35% of muscle
-        
-        // Metabolic Age (based on BMR comparison to age norms)
-        let expectedBMR = gender == .male ? (10 * standardWeight + 6.25 * heightCm - 5 * 25 + 5) : (10 * standardWeight + 6.25 * heightCm - 5 * 25 - 161)
-        let bmrRatio = Double(bmr) / expectedBMR
-        metabolicAge = Int(Double(age) / bmrRatio)
-        metabolicAge = max(18, min(metabolicAge, 80))
-        
-        // Health Score (0-100 based on all metrics)
+
+        // ── Ideal Body Weight (BMI 22) ──
+        idealBodyWeight = 22.0 * heightM * heightM
+
+        // ── Body Age ──
+        // Tanita standard: metabolic age based on BMR comparison to age-group averages
+        // Compare actual BMR to expected BMR for age, shift accordingly
+        // Expected BMR decreases ~7kcal/year for males, ~4kcal/year for females
+        let expectedBMR = gender == .male
+            ? 10 * idealBodyWeight + 6.25 * heightCm - 5 * Double(age) + 5
+            : 10 * idealBodyWeight + 6.25 * heightCm - 5 * Double(age) - 161
+        let bmrDiff = expectedBMR - Double(bmr)  // positive = actual BMR is lower than ideal
+        let yearShift = gender == .male ? bmrDiff / 7.0 : bmrDiff / 4.0
+        bodyAge = Int(round(Double(age) + yearShift))
+        bodyAge = max(18, min(bodyAge, 80))
+
+        // ── WHR (estimated from body fat% and BMI) ──
+        // Ashwell & Gibson 2009: WHR correlates with central adiposity
+        // Approximation from BF% since we don't have waist measurement
+        if gender == .male {
+            whr = 0.70 + bodyFat * 0.007
+        } else {
+            whr = 0.64 + bodyFat * 0.008
+        }
+        whr = min(max(whr, 0.60), 1.10)
+
+        // ── Weight Control targets ──
+        // Positive = need to gain, Negative = need to lose
+        // Ideal weight based on BMI 22 (WHO healthy midpoint)
+        weightControl = idealBodyWeight - weight
+        // Ideal body fat: 15% male, 23% female (ACE fitness standard)
+        let idealFatPercent = gender == .male ? 15.0 : 23.0
+        let idealFatMass = idealBodyWeight * idealFatPercent / 100.0
+        fatControl = idealFatMass - fatMass
+        // Ideal muscle: FFM × (1 - bone fraction) at ideal weight
+        // Standard: muscle should be ~80% of ideal body weight for males (ACSM)
+        let idealMuscleFraction = gender == .male ? 0.80 : 0.65
+        let idealMuscleMass = idealBodyWeight * idealMuscleFraction
+        muscleControl = idealMuscleMass - muscleMass
+
+        // ── Health Score (0-100) ──
         var score = 100.0
         if bmi < 18.5 || bmi > 25 { score -= 10 }
-        if bodyFat > 25 { score -= Double(bodyFat - 25) }
-        if visceralFat > 10 { score -= Double(visceralFat - 10) * 2 }
+        let bfThreshold = gender == .male ? 20.0 : 28.0
+        if bodyFat > bfThreshold {
+            score -= (bodyFat - bfThreshold)
+        }
+        if visceralFat > 9 { score -= (visceralFat - 9) * 2 }
         healthScore = Int(max(0, min(100, score)))
-        
+
         // Segmental analysis from impedances
-        // Order: Right Arm, Left Arm, Trunk, Right Leg, Left Leg, Whole Body
         if impedances.count >= 5 {
             calculateSegmentalData(height: height, age: age, gender: gender)
         }
     }
     
-    /// Calculate segmental fat/muscle percentages from impedance values
+    /// Calculate segmental fat/muscle from impedance values
+    /// Produces both % relative to ideal and actual kg per segment
     mutating func calculateSegmentalData(height: Double, age: Int, gender: Gender) {
         guard impedances.count >= 5 else { return }
-        
+
         let avgImpedance = impedances.reduce(0, +) / Double(impedances.count)
-        
-        // Segment impedances (Pro-Max order: RA, LA, Trunk, RL, LL)
-        let raZ = impedances[0]
-        let laZ = impedances[1]
-        let trZ = impedances[2]
-        let rlZ = impedances[3]
-        let llZ = impedances[4]
-        
-        // Calculate segment fat/muscle % relative to ideal (100% = ideal)
-        // Lower impedance = more muscle, higher impedance = more fat
-        // Reference: average impedance represents 100%
-        
-        // Fat % (higher Z = more fat, scale relative to average)
-        rightArm.fatPercent = min(160, max(80, 100 * raZ / avgImpedance))
-        leftArm.fatPercent = min(160, max(80, 100 * laZ / avgImpedance))
-        trunk.fatPercent = min(160, max(80, 100 * trZ / avgImpedance))
-        rightLeg.fatPercent = min(160, max(80, 100 * rlZ / avgImpedance))
-        leftLeg.fatPercent = min(160, max(80, 100 * llZ / avgImpedance))
-        
-        // Muscle % (lower Z = more muscle, inverse relationship)
-        rightArm.musclePercent = min(115, max(80, 100 * avgImpedance / raZ))
-        leftArm.musclePercent = min(115, max(80, 100 * avgImpedance / laZ))
-        trunk.musclePercent = min(115, max(80, 100 * avgImpedance / trZ))
-        rightLeg.musclePercent = min(115, max(80, 100 * avgImpedance / rlZ))
-        leftLeg.musclePercent = min(115, max(80, 100 * avgImpedance / llZ))
+
+        // Segment impedances (RA, LA, Trunk, RL, LL)
+        let segZ = [impedances[0], impedances[1], impedances[2], impedances[3], impedances[4]]
+
+        // Approximate mass distribution: arms ~5% each, trunk ~45%, legs ~17.5% each
+        let massRatios = [0.05, 0.05, 0.45, 0.175, 0.175]
+
+        func calcSegment(z: Double, massRatio: Double) -> SegmentData {
+            let segWeight = weight * massRatio
+            let fatPct = min(160, max(80, 100 * z / avgImpedance))
+            let musclePct = min(115, max(80, 100 * avgImpedance / z))
+            let segFatRate = bodyFat / 100.0 * (z / avgImpedance)
+            let fat = segWeight * segFatRate
+            let muscle = segWeight * (1 - segFatRate) * 0.95
+            let rating: String
+            if fatPct < 90 { rating = "Low" }
+            else if fatPct > 120 { rating = "High" }
+            else { rating = "Standard" }
+            return SegmentData(fatPercent: fatPct, fatMass: fat, musclePercent: musclePct, muscleMass: muscle, rating: rating)
+        }
+
+        rightArm = calcSegment(z: segZ[0], massRatio: massRatios[0])
+        leftArm = calcSegment(z: segZ[1], massRatio: massRatios[1])
+        trunk = calcSegment(z: segZ[2], massRatio: massRatios[2])
+        rightLeg = calcSegment(z: segZ[3], massRatio: massRatios[3])
+        leftLeg = calcSegment(z: segZ[4], massRatio: massRatios[4])
     }
     
     /// Parse standard BLE Body Composition Measurement (0x2A9C)

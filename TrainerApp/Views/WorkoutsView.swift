@@ -85,47 +85,43 @@ struct WorkoutsView: View {
 struct WorkoutPlanRow: View {
     let plan: WorkoutPlan
     let ftp: Int
-    
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 4) {
             HStack {
                 Text(plan.name)
                     .font(.headline)
                 Spacer()
-                Text(plan.category.rawValue)
+                Text(plan.formattedDurationLong)
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                Text(plan.category.rawValue)
+                    .font(.caption2)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(.quaternary, in: Capsule())
             }
-            
+
             WorkoutGraph(intervals: plan.intervals, ftp: ftp)
-                .frame(height: 45)
+                .frame(height: 40)
                 .clipShape(RoundedRectangle(cornerRadius: 2))
-            
-            HStack(spacing: 16) {
-                Text(plan.formattedDurationLong)
-                    .fontWeight(.medium)
-                HStack(spacing: 4) {
-                    Text("\(plan.estimatedTSS)")
-                        .fontWeight(.medium)
-                    Text("TSS")
-                        .foregroundStyle(.tertiary)
-                }
-                HStack(spacing: 4) {
-                    Text(plan.formattedIF)
-                        .fontWeight(.medium)
-                    Text("IF")
-                        .foregroundStyle(.tertiary)
-                }
-                HStack(spacing: 4) {
-                    Text("\(plan.estimatedKJ(ftp: ftp))")
-                        .fontWeight(.medium)
-                    Text("KJ")
-                        .foregroundStyle(.tertiary)
-                }
+
+            if !plan.description.isEmpty {
+                Text(plan.description)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+            }
+
+            HStack(spacing: 12) {
+                Label("\(plan.estimatedTSS)", systemImage: "bolt.fill")
+                Label(plan.formattedIF, systemImage: "gauge.medium")
+                Label("\(plan.estimatedKJ(ftp: ftp))kJ", systemImage: "flame.fill")
             }
             .font(.caption2)
+            .foregroundStyle(.secondary)
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 2)
     }
 }
 
@@ -183,32 +179,30 @@ struct WorkoutDetailView: View {
                     .frame(height: 120)
                 
                 List {
-                // Stats
                 Section {
-                    LabeledContent("Duration", value: plan.formattedDurationLong)
-                    LabeledContent("TSS", value: "\(plan.estimatedTSS)")
-                    LabeledContent("IF", value: plan.formattedIF)
-                    LabeledContent("KJ", value: "\(plan.estimatedKJ(ftp: ftp))")
-                } header: {
-                    Text("Estimated Load")
-                }
-                
-                // Description
-                if !plan.description.isEmpty {
-                    Section {
+                    // Description
+                    if !plan.description.isEmpty {
                         Text(plan.description)
-                            .font(.body)
+                            .font(.subheadline)
                             .foregroundStyle(.secondary)
-                    } header: {
-                        Text("Description")
                     }
-                }
-                
-                // Shorthand with copy button
-                Section {
+
+                    // Estimated Load — compact row
+                    HStack {
+                        LoadStat(label: "Duration", value: plan.formattedDurationLong)
+                        Divider()
+                        LoadStat(label: "TSS", value: "\(plan.estimatedTSS)")
+                        Divider()
+                        LoadStat(label: "IF", value: plan.formattedIF)
+                        Divider()
+                        LoadStat(label: "KJ", value: "\(plan.estimatedKJ(ftp: ftp))")
+                    }
+                    .frame(maxWidth: .infinity)
+
+                    // Shorthand with copy button
                     HStack {
                         Text(plan.generatedShorthand)
-                            .font(.system(.caption, design: .monospaced))
+                            .font(.system(.caption2, design: .monospaced))
                             .foregroundStyle(.orange)
                         Spacer()
                         Button {
@@ -228,8 +222,6 @@ struct WorkoutDetailView: View {
                         }
                         .buttonStyle(.plain)
                     }
-                } header: {
-                    Text("Shorthand")
                 }
                 
                 Section {
@@ -518,5 +510,23 @@ struct CreateWorkoutView: View {
         plan.shorthand = shorthand
         store.addCustomPlan(plan)
         dismiss()
+    }
+}
+
+// MARK: - Load Stat (compact column)
+
+struct LoadStat: View {
+    let label: String
+    let value: String
+
+    var body: some View {
+        VStack(spacing: 2) {
+            Text(value)
+                .font(.subheadline.bold())
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
     }
 }
