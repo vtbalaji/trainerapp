@@ -63,8 +63,7 @@ enum GDQSFoodGroup: String, Codable, CaseIterable {
              .wholeGrains, .liquidOils, .fishShellfish, .poultryGameMeat,
              .lowFatDairy, .eggs: return 2
         case .cruciferous, .deepOrangeVegetables, .otherVegetables, .deepOrangeTubers: return 0.5
-        case .redMeat: return 1
-        case .highFatDairy: return 2
+        case .redMeat, .highFatDairy: return 1
         case .processedMeat, .refinedGrains, .sweetsIceCream,
              .sugarSweetenedBeverages, .juice, .whiteRootsTubers, .purchasedDeepFried: return 2
         case .other: return 0
@@ -273,7 +272,7 @@ enum GDQSScoring {
         case .eggs:                  return g < 6 ? 0 : g <= 32 ? 1 : 2
         // Unhealthy-in-excess (moderate = points, excess = 0)
         case .redMeat:               return g < 9 ? 0 : g <= 46 ? 1 : 0
-        case .highFatDairy:          return g < 35 ? 0 : g <= 142 ? 1 : g <= 734 ? 2 : 0
+        case .highFatDairy:          return g < 35 ? 0 : g <= 142 ? 1 : 0
         // Unhealthy (lower = better, reverse scored)
         case .processedMeat:         return g < 9 ? 2 : g <= 30 ? 1 : 0
         case .refinedGrains:         return g < 7 ? 2 : g <= 33 ? 1 : 0
@@ -290,9 +289,6 @@ enum GDQSScoring {
 // MARK: - Indian Food Database
 
 struct IndianFoodDatabase {
-
-    // Cheese-like foods that need milk-equivalent conversion (×6.1)
-    static let cheeseFoods: Set<String> = ["paneer", "palak paneer"]
 
     static let foods: [String: (group: GDQSFoodGroup, nutrition: NutritionInfo)] = [
         // South Indian - Breakfast
@@ -313,8 +309,23 @@ struct IndianFoodDatabase {
         "sakkarai pongal": (.sweetsIceCream, NutritionInfo(calories: 200, protein: 3, carbohydrates: 35, fiber: 1, sugar: 20, fat: 7, saturatedFat: 4, sodium: 50)),
         "adai": (.legumes, NutritionInfo(calories: 130, protein: 5, carbohydrates: 18, fiber: 3, sugar: 1, fat: 4, saturatedFat: 0.5, sodium: 120)),
         "paniyaram": (.wholeGrains, NutritionInfo(calories: 80, protein: 2, carbohydrates: 12, fiber: 0.5, sugar: 1, fat: 3, saturatedFat: 0.5, sodium: 80)),
-        "upma": (.wholeGrains, NutritionInfo(calories: 150, protein: 4, carbohydrates: 22, fiber: 2, sugar: 1, fat: 5, saturatedFat: 1, sodium: 300)),
-        "poha": (.wholeGrains, NutritionInfo(calories: 130, protein: 3, carbohydrates: 25, fiber: 2, sugar: 2, fat: 3, saturatedFat: 0.5, sodium: 200)),
+        "ragi": (.wholeGrains, NutritionInfo(calories: 328, protein: 7, carbohydrates: 72, fiber: 4, sugar: 2, fat: 1.3, saturatedFat: 0.3, sodium: 11)),
+        "ragi dosa": (.wholeGrains, NutritionInfo(calories: 120, protein: 4, carbohydrates: 20, fiber: 2, sugar: 1, fat: 3, saturatedFat: 0.5, sodium: 120)),
+        "ragi mudde": (.wholeGrains, NutritionInfo(calories: 110, protein: 3, carbohydrates: 24, fiber: 3, sugar: 1, fat: 0.5, saturatedFat: 0.1, sodium: 5)),
+        "ragi porridge": (.wholeGrains, NutritionInfo(calories: 100, protein: 3, carbohydrates: 20, fiber: 2, sugar: 3, fat: 1, saturatedFat: 0.5, sodium: 30)),
+        "kambu": (.wholeGrains, NutritionInfo(calories: 361, protein: 12, carbohydrates: 67, fiber: 8, sugar: 2, fat: 5, saturatedFat: 1, sodium: 5)),
+        "kambu koozh": (.wholeGrains, NutritionInfo(calories: 90, protein: 3, carbohydrates: 18, fiber: 3, sugar: 1, fat: 1, saturatedFat: 0.2, sodium: 10)),
+        "thinai": (.wholeGrains, NutritionInfo(calories: 340, protein: 12, carbohydrates: 60, fiber: 8, sugar: 1, fat: 4, saturatedFat: 0.7, sodium: 5)),
+        "thinai rice": (.wholeGrains, NutritionInfo(calories: 130, protein: 4, carbohydrates: 24, fiber: 3, sugar: 1, fat: 2, saturatedFat: 0.3, sodium: 5)),
+        "varagu": (.wholeGrains, NutritionInfo(calories: 329, protein: 10, carbohydrates: 66, fiber: 7, sugar: 1, fat: 3, saturatedFat: 0.5, sodium: 5)),
+        "varagu rice": (.wholeGrains, NutritionInfo(calories: 125, protein: 3, carbohydrates: 24, fiber: 3, sugar: 1, fat: 1.5, saturatedFat: 0.3, sodium: 5)),
+        "samai": (.wholeGrains, NutritionInfo(calories: 330, protein: 10, carbohydrates: 65, fiber: 7, sugar: 1, fat: 3.5, saturatedFat: 0.6, sodium: 5)),
+        "samai rice": (.wholeGrains, NutritionInfo(calories: 125, protein: 3, carbohydrates: 24, fiber: 3, sugar: 1, fat: 1.5, saturatedFat: 0.3, sodium: 5)),
+        "kuthiraivali": (.wholeGrains, NutritionInfo(calories: 309, protein: 9, carbohydrates: 66, fiber: 9, sugar: 1, fat: 2, saturatedFat: 0.4, sodium: 5)),
+        "millet dosa": (.wholeGrains, NutritionInfo(calories: 115, protein: 4, carbohydrates: 18, fiber: 3, sugar: 1, fat: 3, saturatedFat: 0.5, sodium: 120)),
+        "millet pongal": (.wholeGrains, NutritionInfo(calories: 140, protein: 4, carbohydrates: 20, fiber: 3, sugar: 1, fat: 5, saturatedFat: 2, sodium: 180)),
+        "upma": (.refinedGrains, NutritionInfo(calories: 150, protein: 4, carbohydrates: 22, fiber: 2, sugar: 1, fat: 5, saturatedFat: 1, sodium: 300)),
+        "poha": (.refinedGrains, NutritionInfo(calories: 130, protein: 3, carbohydrates: 25, fiber: 2, sugar: 2, fat: 3, saturatedFat: 0.5, sodium: 200)),
         "sevai": (.refinedGrains, NutritionInfo(calories: 140, protein: 3, carbohydrates: 25, fiber: 1, sugar: 1, fat: 4, saturatedFat: 1, sodium: 150)),
         "idiyappam": (.refinedGrains, NutritionInfo(calories: 130, protein: 2, carbohydrates: 25, fiber: 0.5, sugar: 0, fat: 3, saturatedFat: 2, sodium: 40)),
         "kozhukattai": (.wholeGrains, NutritionInfo(calories: 100, protein: 2, carbohydrates: 18, fiber: 1, sugar: 5, fat: 3, saturatedFat: 2, sodium: 30)),
@@ -361,7 +372,7 @@ struct IndianFoodDatabase {
 
         // South Indian - Snacks (deep fried)
         "murukku": (.purchasedDeepFried, NutritionInfo(calories: 450, protein: 8, carbohydrates: 55, fiber: 2, sugar: 1, fat: 22, saturatedFat: 3, sodium: 400)),
-        "mixture": (.nutsAndSeeds, NutritionInfo(calories: 480, protein: 10, carbohydrates: 50, fiber: 3, sugar: 2, fat: 28, saturatedFat: 4, sodium: 500)),
+        "mixture": (.purchasedDeepFried, NutritionInfo(calories: 480, protein: 10, carbohydrates: 50, fiber: 3, sugar: 2, fat: 28, saturatedFat: 4, sodium: 500)),
         "banana chips": (.purchasedDeepFried, NutritionInfo(calories: 520, protein: 2, carbohydrates: 58, fiber: 4, sugar: 5, fat: 33, saturatedFat: 28, sodium: 200)),
         "bonda": (.purchasedDeepFried, NutritionInfo(calories: 170, protein: 3, carbohydrates: 20, fiber: 1, sugar: 1, fat: 9, saturatedFat: 1, sodium: 200)),
         "bajji": (.purchasedDeepFried, NutritionInfo(calories: 150, protein: 3, carbohydrates: 18, fiber: 2, sugar: 1, fat: 8, saturatedFat: 1, sodium: 220)),
@@ -393,6 +404,8 @@ struct IndianFoodDatabase {
         "lassi": (.lowFatDairy, NutritionInfo(calories: 110, protein: 4, carbohydrates: 18, fiber: 0, sugar: 16, fat: 3, saturatedFat: 2, sodium: 80)),
         "gulab jamun": (.sweetsIceCream, NutritionInfo(calories: 150, protein: 2, carbohydrates: 25, fiber: 0, sugar: 20, fat: 6, saturatedFat: 3, sodium: 50)),
         "jalebi": (.sweetsIceCream, NutritionInfo(calories: 150, protein: 1, carbohydrates: 30, fiber: 0, sugar: 25, fat: 4, saturatedFat: 2, sodium: 30)),
+        "dark chocolate": (.other, NutritionInfo(calories: 546, protein: 5, carbohydrates: 60, fiber: 7, sugar: 24, fat: 31, saturatedFat: 19, sodium: 6)),
+        "chocolate": (.sweetsIceCream, NutritionInfo(calories: 535, protein: 7, carbohydrates: 60, fiber: 3, sugar: 52, fat: 30, saturatedFat: 18, sodium: 75)),
         "paratha": (.refinedGrains, NutritionInfo(calories: 260, protein: 5, carbohydrates: 32, fiber: 2, sugar: 1, fat: 13, saturatedFat: 3, sodium: 350)),
         "naan": (.refinedGrains, NutritionInfo(calories: 262, protein: 9, carbohydrates: 45, fiber: 2, sugar: 3, fat: 5, saturatedFat: 1, sodium: 400)),
         "butter chicken": (.poultryGameMeat, NutritionInfo(calories: 240, protein: 18, carbohydrates: 8, fiber: 1, sugar: 4, fat: 16, saturatedFat: 8, sodium: 550)),
@@ -401,8 +414,13 @@ struct IndianFoodDatabase {
 
         // Common items
         "tea": (.other, NutritionInfo(calories: 50, protein: 1, carbohydrates: 10, fiber: 0, sugar: 8, fat: 1, saturatedFat: 0.5, sodium: 10)),
+        "green tea": (.other, NutritionInfo(calories: 2, protein: 0, carbohydrates: 0, fiber: 0, sugar: 0, fat: 0, saturatedFat: 0, sodium: 1)),
+        "black tea": (.other, NutritionInfo(calories: 2, protein: 0, carbohydrates: 0.5, fiber: 0, sugar: 0, fat: 0, saturatedFat: 0, sodium: 3)),
+        "black coffee": (.other, NutritionInfo(calories: 2, protein: 0.3, carbohydrates: 0, fiber: 0, sugar: 0, fat: 0, saturatedFat: 0, sodium: 2)),
         "coffee": (.other, NutritionInfo(calories: 60, protein: 1, carbohydrates: 10, fiber: 0, sugar: 8, fat: 2, saturatedFat: 1, sodium: 10)),
         "filter coffee": (.other, NutritionInfo(calories: 60, protein: 1, carbohydrates: 10, fiber: 0, sugar: 8, fat: 2, saturatedFat: 1, sodium: 10)),
+        "protein shake": (.lowFatDairy, NutritionInfo(calories: 120, protein: 25, carbohydrates: 5, fiber: 1, sugar: 2, fat: 2, saturatedFat: 0.5, sodium: 150)),
+        "amla": (.citrusFruits, NutritionInfo(calories: 44, protein: 0.9, carbohydrates: 10, fiber: 4.3, sugar: 4, fat: 0.6, saturatedFat: 0.1, sodium: 1)),
         "buttermilk": (.lowFatDairy, NutritionInfo(calories: 30, protein: 2, carbohydrates: 4, fiber: 0, sugar: 3, fat: 1, saturatedFat: 0.5, sodium: 200)),
         "curd": (.lowFatDairy, NutritionInfo(calories: 60, protein: 4, carbohydrates: 5, fiber: 0, sugar: 4, fat: 3, saturatedFat: 2, sodium: 50)),
         "yogurt": (.lowFatDairy, NutritionInfo(calories: 60, protein: 4, carbohydrates: 5, fiber: 0, sugar: 4, fat: 3, saturatedFat: 2, sodium: 50)),
@@ -420,9 +438,32 @@ struct IndianFoodDatabase {
         "watermelon": (.otherFruits, NutritionInfo(calories: 30, protein: 0.6, carbohydrates: 8, fiber: 0.4, sugar: 6, fat: 0.2, saturatedFat: 0, sodium: 1)),
         "pomegranate": (.otherFruits, NutritionInfo(calories: 83, protein: 1.7, carbohydrates: 19, fiber: 4, sugar: 14, fat: 1.2, saturatedFat: 0.1, sodium: 3)),
         "guava": (.otherFruits, NutritionInfo(calories: 68, protein: 2.6, carbohydrates: 14, fiber: 5.4, sugar: 9, fat: 1, saturatedFat: 0.3, sodium: 2)),
-        "coconut": (.otherFruits, NutritionInfo(calories: 354, protein: 3.3, carbohydrates: 15, fiber: 9, sugar: 6, fat: 33, saturatedFat: 30, sodium: 20)),
+        "coconut": (.nutsAndSeeds, NutritionInfo(calories: 354, protein: 3.3, carbohydrates: 15, fiber: 9, sugar: 6, fat: 33, saturatedFat: 30, sodium: 20)),
         "jackfruit": (.deepOrangeFruits, NutritionInfo(calories: 95, protein: 1.7, carbohydrates: 23, fiber: 1.5, sugar: 19, fat: 0.6, saturatedFat: 0.2, sodium: 2)),
         "grapes": (.otherFruits, NutritionInfo(calories: 69, protein: 0.7, carbohydrates: 18, fiber: 0.9, sugar: 16, fat: 0.2, saturatedFat: 0.1, sodium: 2)),
+        "pear": (.otherFruits, NutritionInfo(calories: 57, protein: 0.4, carbohydrates: 15, fiber: 3.1, sugar: 10, fat: 0.1, saturatedFat: 0, sodium: 1)),
+        "pineapple": (.otherFruits, NutritionInfo(calories: 50, protein: 0.5, carbohydrates: 13, fiber: 1.4, sugar: 10, fat: 0.1, saturatedFat: 0, sodium: 1)),
+        "sapota": (.otherFruits, NutritionInfo(calories: 83, protein: 0.4, carbohydrates: 20, fiber: 5.3, sugar: 14, fat: 1.1, saturatedFat: 0.2, sodium: 12)),
+        "custard apple": (.otherFruits, NutritionInfo(calories: 94, protein: 2.1, carbohydrates: 24, fiber: 4.4, sugar: 19, fat: 0.3, saturatedFat: 0, sodium: 4)),
+        "lychee": (.otherFruits, NutritionInfo(calories: 66, protein: 0.8, carbohydrates: 17, fiber: 1.3, sugar: 15, fat: 0.4, saturatedFat: 0.1, sodium: 1)),
+        "sweet lime": (.citrusFruits, NutritionInfo(calories: 43, protein: 0.7, carbohydrates: 9, fiber: 0.5, sugar: 8, fat: 0.3, saturatedFat: 0, sodium: 1)),
+        "lemon": (.citrusFruits, NutritionInfo(calories: 29, protein: 1.1, carbohydrates: 9, fiber: 2.8, sugar: 2.5, fat: 0.3, saturatedFat: 0, sodium: 2)),
+        "strawberry": (.otherFruits, NutritionInfo(calories: 32, protein: 0.7, carbohydrates: 8, fiber: 2, sugar: 5, fat: 0.3, saturatedFat: 0, sodium: 1)),
+        "blueberry": (.otherFruits, NutritionInfo(calories: 57, protein: 0.7, carbohydrates: 14, fiber: 2.4, sugar: 10, fat: 0.3, saturatedFat: 0, sodium: 1)),
+
+        // Vegetables & Salad items
+        "cucumber": (.otherVegetables, NutritionInfo(calories: 15, protein: 0.7, carbohydrates: 3.6, fiber: 0.5, sugar: 1.7, fat: 0.1, saturatedFat: 0, sodium: 2)),
+        "carrot": (.deepOrangeVegetables, NutritionInfo(calories: 41, protein: 0.9, carbohydrates: 10, fiber: 2.8, sugar: 5, fat: 0.2, saturatedFat: 0, sodium: 69)),
+        "beetroot": (.otherVegetables, NutritionInfo(calories: 43, protein: 1.6, carbohydrates: 10, fiber: 2.8, sugar: 7, fat: 0.2, saturatedFat: 0, sodium: 78)),
+        "tomato": (.otherVegetables, NutritionInfo(calories: 18, protein: 0.9, carbohydrates: 3.9, fiber: 1.2, sugar: 2.6, fat: 0.2, saturatedFat: 0, sodium: 5)),
+        "onion": (.otherVegetables, NutritionInfo(calories: 40, protein: 1.1, carbohydrates: 9.3, fiber: 1.7, sugar: 4.2, fat: 0.1, saturatedFat: 0, sodium: 4)),
+        "cabbage": (.cruciferous, NutritionInfo(calories: 25, protein: 1.3, carbohydrates: 6, fiber: 2.5, sugar: 3.2, fat: 0.1, saturatedFat: 0, sodium: 18)),
+        "broccoli": (.cruciferous, NutritionInfo(calories: 34, protein: 2.8, carbohydrates: 7, fiber: 2.6, sugar: 1.7, fat: 0.4, saturatedFat: 0.1, sodium: 33)),
+        "cauliflower": (.cruciferous, NutritionInfo(calories: 25, protein: 1.9, carbohydrates: 5, fiber: 2, sugar: 1.9, fat: 0.3, saturatedFat: 0.1, sodium: 30)),
+        "beans": (.otherVegetables, NutritionInfo(calories: 31, protein: 1.8, carbohydrates: 7, fiber: 3.4, sugar: 1.4, fat: 0.1, saturatedFat: 0, sodium: 6)),
+        "drumstick": (.otherVegetables, NutritionInfo(calories: 37, protein: 2, carbohydrates: 8.5, fiber: 2, sugar: 3, fat: 0.1, saturatedFat: 0, sodium: 42)),
+        "sweet potato": (.deepOrangeTubers, NutritionInfo(calories: 86, protein: 1.6, carbohydrates: 20, fiber: 3, sugar: 4.2, fat: 0.1, saturatedFat: 0, sodium: 55)),
+        "salad": (.otherVegetables, NutritionInfo(calories: 20, protein: 1, carbohydrates: 4, fiber: 1.5, sugar: 2, fat: 0.2, saturatedFat: 0, sodium: 10)),
     ]
 
     // Alternate spellings → canonical name
@@ -461,6 +502,26 @@ struct IndianFoodDatabase {
         "peanut": "peanuts", "groundnut": "peanuts", "verkadalai": "peanuts",
         "flaxseed": "flaxseeds", "alsi": "flaxseeds",
         "nuts": "mixed nuts", "dry fruits": "mixed nuts",
+        "finger millet": "ragi", "nachni": "ragi", "kelvaragu": "ragi", "ragi ball": "ragi mudde",
+        "pearl millet": "kambu", "bajra": "kambu", "sajje": "kambu", "kambu kool": "kambu koozh",
+        "foxtail millet": "thinai", "kangni": "thinai", "navane": "thinai",
+        "kodo millet": "varagu", "arikelu": "varagu",
+        "little millet": "samai", "kutki": "samai", "same": "samai",
+        "barnyard millet": "kuthiraivali", "sanwa": "kuthiraivali", "udalu": "kuthiraivali",
+        "millet": "thinai",
+        "chikku": "sapota", "sapodilla": "sapota",
+        "mosambi": "sweet lime", "mousambi": "sweet lime",
+        "sitaphal": "custard apple", "seetha pazham": "custard apple",
+        "litchi": "lychee",
+        "vellarikkai": "cucumber", "kheera": "cucumber", "kakdi": "cucumber",
+        "indian gooseberry": "amla", "nellikai": "amla", "usiri": "amla",
+        "gajar": "carrot",
+        "beet": "beetroot", "beets": "beetroot",
+        "green beans": "beans", "french beans": "beans",
+        "murungakkai": "drumstick", "moringa": "drumstick",
+        "shakarkandi": "sweet potato",
+        "gobi": "cauliflower",
+        "black chocolate": "dark chocolate",
     ]
 
     static func lookup(_ name: String) -> (group: GDQSFoodGroup, nutrition: NutritionInfo)? {
@@ -502,69 +563,125 @@ struct MealPresetItem {
     let servingSize: Double
 }
 
+enum MealPresetCategory: String, CaseIterable {
+    case beverages = "Beverages"
+    case breakfast = "Breakfast"
+    case meals = "Meals"
+    case dinner = "Dinner"
+}
+
 struct MealPreset: Identifiable {
     let id = UUID()
     let name: String
     let icon: String
+    let category: MealPresetCategory
     let items: [MealPresetItem]
 }
 
 enum MealPresets {
     static let all: [MealPreset] = [
-        MealPreset(name: "Idli + Chutney + Sambar", icon: "sunrise", items: [
+        // Beverages
+        MealPreset(name: "Coffee", icon: "cup.and.saucer", category: .beverages, items: [
+            MealPresetItem(name: "coffee", servingSize: 150),
+        ]),
+        MealPreset(name: "Black Coffee", icon: "cup.and.saucer", category: .beverages, items: [
+            MealPresetItem(name: "black coffee", servingSize: 150),
+        ]),
+        MealPreset(name: "Tea", icon: "cup.and.saucer", category: .beverages, items: [
+            MealPresetItem(name: "tea", servingSize: 150),
+        ]),
+        MealPreset(name: "Protein Shake", icon: "cup.and.saucer", category: .beverages, items: [
+            MealPresetItem(name: "protein shake", servingSize: 300),
+        ]),
+        MealPreset(name: "Cucumber + Amla", icon: "leaf", category: .beverages, items: [
+            MealPresetItem(name: "cucumber", servingSize: 100),
+            MealPresetItem(name: "amla", servingSize: 50),
+        ]),
+
+        // Breakfast
+        MealPreset(name: "Idli + Chutney + Sambar", icon: "sunrise", category: .breakfast, items: [
             MealPresetItem(name: "idli", servingSize: 120),
             MealPresetItem(name: "coconut chutney", servingSize: 30),
             MealPresetItem(name: "sambar", servingSize: 100),
         ]),
-        MealPreset(name: "Dosa + Chutney + Sambar", icon: "sunrise", items: [
+        MealPreset(name: "Dosa + Chutney + Sambar", icon: "sunrise", category: .breakfast, items: [
             MealPresetItem(name: "dosa", servingSize: 100),
             MealPresetItem(name: "coconut chutney", servingSize: 30),
             MealPresetItem(name: "sambar", servingSize: 100),
         ]),
-        MealPreset(name: "Pongal + Chutney", icon: "sunrise", items: [
+        MealPreset(name: "Pongal + Chutney", icon: "sunrise", category: .breakfast, items: [
             MealPresetItem(name: "pongal", servingSize: 150),
             MealPresetItem(name: "coconut chutney", servingSize: 30),
         ]),
-        MealPreset(name: "Upma + Banana", icon: "sunrise", items: [
+        MealPreset(name: "Ragi Dosa + Chutney + Sambar", icon: "sunrise", category: .breakfast, items: [
+            MealPresetItem(name: "ragi dosa", servingSize: 100),
+            MealPresetItem(name: "coconut chutney", servingSize: 30),
+            MealPresetItem(name: "sambar", servingSize: 100),
+        ]),
+        MealPreset(name: "Millet Pongal + Chutney", icon: "sunrise", category: .breakfast, items: [
+            MealPresetItem(name: "millet pongal", servingSize: 150),
+            MealPresetItem(name: "coconut chutney", servingSize: 30),
+        ]),
+        MealPreset(name: "Ragi Porridge", icon: "sunrise", category: .breakfast, items: [
+            MealPresetItem(name: "ragi porridge", servingSize: 200),
+        ]),
+        MealPreset(name: "Upma + Banana", icon: "sunrise", category: .breakfast, items: [
             MealPresetItem(name: "upma", servingSize: 150),
             MealPresetItem(name: "banana", servingSize: 100),
         ]),
-        MealPreset(name: "Rice + Sambar + Poriyal", icon: "sun.max", items: [
+
+        // Meals (Lunch)
+        MealPreset(name: "Thinai Rice + Sambar + Poriyal", icon: "sun.max", category: .meals, items: [
+            MealPresetItem(name: "thinai rice", servingSize: 200),
+            MealPresetItem(name: "sambar", servingSize: 150),
+            MealPresetItem(name: "poriyal", servingSize: 100),
+        ]),
+        MealPreset(name: "Varagu Rice + Dal + Curd", icon: "sun.max", category: .meals, items: [
+            MealPresetItem(name: "varagu rice", servingSize: 200),
+            MealPresetItem(name: "dal", servingSize: 100),
+            MealPresetItem(name: "curd", servingSize: 80),
+        ]),
+        MealPreset(name: "Kambu Koozh", icon: "sun.max", category: .meals, items: [
+            MealPresetItem(name: "kambu koozh", servingSize: 250),
+        ]),
+        MealPreset(name: "Rice + Sambar + Poriyal", icon: "sun.max", category: .meals, items: [
             MealPresetItem(name: "rice", servingSize: 200),
             MealPresetItem(name: "sambar", servingSize: 150),
             MealPresetItem(name: "poriyal", servingSize: 100),
         ]),
-        MealPreset(name: "Rice + Rasam + Curd", icon: "sun.max", items: [
+        MealPreset(name: "Rice + Rasam + Curd", icon: "sun.max", category: .meals, items: [
             MealPresetItem(name: "rice", servingSize: 200),
             MealPresetItem(name: "rasam", servingSize: 150),
             MealPresetItem(name: "curd", servingSize: 100),
         ]),
-        MealPreset(name: "Rice + Dal + Poriyal + Curd", icon: "sun.max", items: [
+        MealPreset(name: "Rice + Dal + Poriyal + Curd", icon: "sun.max", category: .meals, items: [
             MealPresetItem(name: "rice", servingSize: 200),
             MealPresetItem(name: "dal", servingSize: 100),
             MealPresetItem(name: "poriyal", servingSize: 100),
             MealPresetItem(name: "curd", servingSize: 80),
         ]),
-        MealPreset(name: "Rice + Palak + Dal", icon: "sun.max", items: [
+        MealPreset(name: "Rice + Palak + Dal", icon: "sun.max", category: .meals, items: [
             MealPresetItem(name: "rice", servingSize: 200),
             MealPresetItem(name: "palak", servingSize: 100),
             MealPresetItem(name: "dal", servingSize: 100),
         ]),
-        MealPreset(name: "Chapati + Dal + Curd", icon: "moon", items: [
+
+        // Dinner
+        MealPreset(name: "Chapati + Dal + Curd", icon: "moon", category: .dinner, items: [
             MealPresetItem(name: "chapati", servingSize: 120),
             MealPresetItem(name: "dal", servingSize: 150),
             MealPresetItem(name: "curd", servingSize: 80),
         ]),
-        MealPreset(name: "Rice + Fish Curry", icon: "moon", items: [
+        MealPreset(name: "Rice + Fish Curry", icon: "moon", category: .dinner, items: [
             MealPresetItem(name: "rice", servingSize: 200),
             MealPresetItem(name: "fish curry", servingSize: 150),
         ]),
-        MealPreset(name: "Rice + Chicken Curry + Raita", icon: "moon", items: [
+        MealPreset(name: "Rice + Chicken Curry + Raita", icon: "moon", category: .dinner, items: [
             MealPresetItem(name: "rice", servingSize: 200),
             MealPresetItem(name: "chicken curry", servingSize: 150),
             MealPresetItem(name: "raita", servingSize: 80),
         ]),
-        MealPreset(name: "Curd Rice", icon: "moon", items: [
+        MealPreset(name: "Curd Rice", icon: "moon", category: .dinner, items: [
             MealPresetItem(name: "curd rice", servingSize: 250),
         ]),
     ]
@@ -586,16 +703,49 @@ class DietQualityStore: ObservableObject {
         saveEntries()
     }
 
+    func adjustServing(_ entry: FoodEntry, delta: Double) {
+        guard let idx = entries.firstIndex(where: { $0.id == entry.id }) else { return }
+        let oldServing = entries[idx].servingSize
+        guard oldServing > 0 else { return }
+        let newServing = max(50, oldServing + delta)
+        let ratio = newServing / oldServing
+        entries[idx].servingSize = newServing
+        let old = entries[idx].nutritionInfo
+        entries[idx].nutritionInfo = NutritionInfo(
+            calories: old.calories * ratio,
+            protein: old.protein * ratio,
+            carbohydrates: old.carbohydrates * ratio,
+            fiber: old.fiber * ratio,
+            sugar: old.sugar * ratio,
+            fat: old.fat * ratio,
+            saturatedFat: old.saturatedFat * ratio,
+            sodium: old.sodium * ratio
+        )
+        saveEntries()
+    }
+
     func addMealPreset(_ preset: MealPreset, date: Date) {
         for item in preset.items {
             let lookup = IndianFoodDatabase.lookup(item.name)
             let group = lookup?.group ?? .other
-            let nutrition = lookup?.nutrition ?? NutritionInfo()
+            let per100 = lookup?.nutrition ?? NutritionInfo()
+            let scale = item.servingSize / 100.0
+            let scaled = NutritionInfo(
+                calories: per100.calories * scale,
+                protein: per100.protein * scale,
+                carbohydrates: per100.carbohydrates * scale,
+                fiber: per100.fiber * scale,
+                sugar: per100.sugar * scale,
+                fat: per100.fat * scale,
+                saturatedFat: per100.saturatedFat * scale,
+                sodium: per100.sodium * scale
+            )
             let entry = FoodEntry(
                 name: item.name.capitalized,
                 category: group,
                 servingSize: item.servingSize,
-                timestamp: date
+                timestamp: date,
+                nutritionInfo: scaled
             )
             entries.append(entry)
         }
@@ -618,11 +768,7 @@ class DietQualityStore: ObservableObject {
         // Aggregate grams per GDQS food group
         var gramsPerGroup: [GDQSFoodGroup: Double] = [:]
         for entry in entries {
-            let grams = entry.servingSize
-            let group = entry.gdqsFoodGroup
-            // Cheese → milk equivalent conversion (×6.1)
-            let multiplier: Double = (group == .highFatDairy && IndianFoodDatabase.cheeseFoods.contains(entry.name.lowercased())) ? 6.1 : 1.0
-            gramsPerGroup[group, default: 0] += grams * multiplier
+            gramsPerGroup[entry.gdqsFoodGroup, default: 0] += entry.servingSize
         }
 
         // Score each group
@@ -641,8 +787,7 @@ class DietQualityStore: ObservableObject {
             case .healthy:
                 plus += score
             case .unhealthyInExcess:
-                // Split: positive portion to plus, remainder to minus
-                plus += max(0, score)
+                plus += score
             case .unhealthy:
                 minus += score
             }
@@ -659,8 +804,27 @@ class DietQualityStore: ObservableObject {
 
     private func loadEntries() {
         if let data = UserDefaults.standard.data(forKey: entriesKey),
-           let loaded = try? JSONDecoder().decode([FoodEntry].self, from: data) {
+           var loaded = try? JSONDecoder().decode([FoodEntry].self, from: data) {
+            // Backfill nutrition for entries saved before scaling fix
+            var needsSave = false
+            for i in loaded.indices where loaded[i].nutritionInfo.calories == 0 {
+                if let (_, per100) = IndianFoodDatabase.lookup(loaded[i].name) {
+                    let scale = loaded[i].servingSize / 100.0
+                    loaded[i].nutritionInfo = NutritionInfo(
+                        calories: per100.calories * scale,
+                        protein: per100.protein * scale,
+                        carbohydrates: per100.carbohydrates * scale,
+                        fiber: per100.fiber * scale,
+                        sugar: per100.sugar * scale,
+                        fat: per100.fat * scale,
+                        saturatedFat: per100.saturatedFat * scale,
+                        sodium: per100.sodium * scale
+                    )
+                    needsSave = true
+                }
+            }
             entries = loaded
+            if needsSave { saveEntries() }
         }
     }
 }

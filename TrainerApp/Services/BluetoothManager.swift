@@ -1034,6 +1034,7 @@ extension BluetoothManager: CBPeripheralDelegate {
                     calibrationOffset: settings.scaleCalibrationOffset
                 )
                 log("✓ Body Fat: \(String(format: "%.1f", scaleData.bodyFat))%, Muscle: \(String(format: "%.1f", scaleData.muscleMass))kg, Water: \(String(format: "%.1f", scaleData.waterPercentage))%")
+                ScaleHistoryStore.shared.saveReading(scaleData)
             }
         }
     }

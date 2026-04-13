@@ -1,4 +1,5 @@
 import SwiftUI
+import Charts
 #if canImport(UIKit)
 import UIKit
 #endif
@@ -81,25 +82,25 @@ struct ScaleView: View {
 
                 // All metrics table (matching Fitdays order)
                 Section {
-                    ScaleMetricRow(label: "Weight", value: String(format: "%.2fkg", d.weight), rating: ScaleData.rating(for: d.weight, low: d.idealBodyWeight * 0.85, high: d.idealBodyWeight * 1.1))
-                    ScaleMetricRow(label: "BMI", value: String(format: "%.1f", d.bmi), rating: ScaleData.bmiRating(d.bmi))
-                    ScaleMetricRow(label: "Body Fat", value: String(format: "%.1f%%", d.bodyFat), rating: ScaleData.bodyFatRating(d.bodyFat, gender: gender))
-                    ScaleMetricRow(label: "Fat Mass", value: String(format: "%.1fkg", d.fatMass), rating: ScaleData.bodyFatRating(d.bodyFat, gender: gender))
-                    ScaleMetricRow(label: "Fat-free Body Weight", value: String(format: "%.1fkg", d.fatFreeWeight), rating: "Standard")
-                    ScaleMetricRow(label: "Muscle Mass", value: String(format: "%.1fkg", d.muscleMass), rating: ScaleData.rating(for: d.muscleRate, low: 70, high: 85))
-                    ScaleMetricRow(label: "Muscle Rate", value: String(format: "%.1f%%", d.muscleRate), rating: ScaleData.rating(for: d.muscleRate, low: 70, high: 85))
-                    ScaleMetricRow(label: "Skeletal Muscle", value: String(format: "%.1f%%", d.skeletalMuscle), rating: ScaleData.rating(for: d.skeletalMuscle, low: 30, high: 55))
-                    ScaleMetricRow(label: "Bone Mass", value: String(format: "%.1fkg", d.boneMass), rating: "Standard")
-                    ScaleMetricRow(label: "Protein Mass", value: String(format: "%.1fkg", d.proteinMass), rating: "Standard")
-                    ScaleMetricRow(label: "Protein", value: String(format: "%.1f%%", d.proteinRate), rating: ScaleData.rating(for: d.proteinRate, low: 10, high: 20))
-                    ScaleMetricRow(label: "Water Weight", value: String(format: "%.1fkg", d.waterWeight), rating: "Standard")
-                    ScaleMetricRow(label: "Body Water", value: String(format: "%.1f%%", d.waterPercentage), rating: ScaleData.rating(for: d.waterPercentage, low: 50, high: 65))
-                    ScaleMetricRow(label: "Subcutaneous Fat", value: String(format: "%.1f%%", d.subcutaneousFat), rating: ScaleData.rating(for: d.subcutaneousFat, low: 5, high: 20))
-                    ScaleMetricRow(label: "Visceral Fat", value: String(format: "%.1f", d.visceralFat), rating: ScaleData.visceralFatRating(d.visceralFat))
-                    ScaleMetricRow(label: "BMR", value: "\(d.bmr)kcal", rating: "")
-                    ScaleMetricRow(label: "Body Age", value: "\(d.bodyAge)", rating: ScaleData.bodyAgeRating(d.bodyAge, actualAge: age))
-                    ScaleMetricRow(label: "WHR", value: String(format: "%.2f", d.whr), rating: d.whr < 0.90 ? "Excellent" : "Standard")
-                    ScaleMetricRow(label: "Ideal Body Weight", value: String(format: "%.1fkg", d.idealBodyWeight), rating: "")
+                    ScaleMetricRow(label: "Weight", value: String(format: "%.2fkg", d.weight), rating: ScaleData.rating(for: d.weight, low: d.idealBodyWeight * 0.85, high: d.idealBodyWeight * 1.1), metricKey: .double(\.weight), unit: "kg")
+                    ScaleMetricRow(label: "BMI", value: String(format: "%.1f", d.bmi), rating: ScaleData.bmiRating(d.bmi), metricKey: .double(\.bmi), unit: "")
+                    ScaleMetricRow(label: "Body Fat", value: String(format: "%.1f%%", d.bodyFat), rating: ScaleData.bodyFatRating(d.bodyFat, gender: gender), metricKey: .double(\.bodyFat), unit: "%")
+                    ScaleMetricRow(label: "Fat Mass", value: String(format: "%.1fkg", d.fatMass), rating: ScaleData.bodyFatRating(d.bodyFat, gender: gender), metricKey: .double(\.fatMass), unit: "kg")
+                    ScaleMetricRow(label: "Fat-free Body Weight", value: String(format: "%.1fkg", d.fatFreeWeight), rating: "Standard", metricKey: .double(\.fatFreeWeight), unit: "kg")
+                    ScaleMetricRow(label: "Muscle Mass", value: String(format: "%.1fkg", d.muscleMass), rating: ScaleData.rating(for: d.muscleRate, low: 70, high: 85), metricKey: .double(\.muscleMass), unit: "kg")
+                    ScaleMetricRow(label: "Muscle Rate", value: String(format: "%.1f%%", d.muscleRate), rating: ScaleData.rating(for: d.muscleRate, low: 70, high: 85), metricKey: .double(\.muscleRate), unit: "%")
+                    ScaleMetricRow(label: "Skeletal Muscle", value: String(format: "%.1f%%", d.skeletalMuscle), rating: ScaleData.rating(for: d.skeletalMuscle, low: 30, high: 55), metricKey: .double(\.skeletalMuscle), unit: "%")
+                    ScaleMetricRow(label: "Bone Mass", value: String(format: "%.1fkg", d.boneMass), rating: "Standard", metricKey: .double(\.boneMass), unit: "kg")
+                    ScaleMetricRow(label: "Protein Mass", value: String(format: "%.1fkg", d.proteinMass), rating: "Standard", metricKey: .double(\.proteinMass), unit: "kg")
+                    ScaleMetricRow(label: "Protein", value: String(format: "%.1f%%", d.proteinRate), rating: ScaleData.rating(for: d.proteinRate, low: 10, high: 20), metricKey: .double(\.proteinRate), unit: "%")
+                    ScaleMetricRow(label: "Water Weight", value: String(format: "%.1fkg", d.waterWeight), rating: "Standard", metricKey: .double(\.waterWeight), unit: "kg")
+                    ScaleMetricRow(label: "Body Water", value: String(format: "%.1f%%", d.waterPercentage), rating: ScaleData.rating(for: d.waterPercentage, low: 50, high: 65), metricKey: .double(\.waterPercentage), unit: "%")
+                    ScaleMetricRow(label: "Subcutaneous Fat", value: String(format: "%.1f%%", d.subcutaneousFat), rating: ScaleData.rating(for: d.subcutaneousFat, low: 5, high: 20), metricKey: .double(\.subcutaneousFat), unit: "%")
+                    ScaleMetricRow(label: "Visceral Fat", value: String(format: "%.1f", d.visceralFat), rating: ScaleData.visceralFatRating(d.visceralFat), metricKey: .double(\.visceralFat), unit: "")
+                    ScaleMetricRow(label: "BMR", value: "\(d.bmr)kcal", rating: "", metricKey: .int(\.bmr), unit: "kcal")
+                    ScaleMetricRow(label: "Body Age", value: "\(d.bodyAge)", rating: ScaleData.bodyAgeRating(d.bodyAge, actualAge: age), metricKey: .int(\.bodyAge), unit: "")
+                    ScaleMetricRow(label: "WHR", value: String(format: "%.2f", d.whr), rating: d.whr < 0.90 ? "Excellent" : "Standard", metricKey: .double(\.whr), unit: "")
+                    ScaleMetricRow(label: "Ideal Body Weight", value: String(format: "%.1fkg", d.idealBodyWeight), rating: "", metricKey: .double(\.idealBodyWeight), unit: "kg")
                 } header: {
                     HStack {
                         Text("Index")
@@ -334,26 +335,61 @@ struct ScaleView: View {
     }
 }
 
+// MARK: - Metric Key
+
+enum ScaleMetricKey {
+    case double(KeyPath<ScaleData, Double>)
+    case int(KeyPath<ScaleData, Int>)
+
+    func values(for period: ScaleHistoryPeriod, store: ScaleHistoryStore) -> [(date: Date, value: Double)] {
+        switch self {
+        case .double(let kp): return store.metricValues(period, keyPath: kp)
+        case .int(let kp): return store.metricValuesInt(period, keyPath: kp)
+        }
+    }
+}
+
 // MARK: - Metric Row (Fitdays-style table)
 
 struct ScaleMetricRow: View {
     let label: String
     let value: String
     let rating: String
+    var metricKey: ScaleMetricKey? = nil
+    var unit: String = ""
+    @State private var showHistory = false
 
     var body: some View {
-        HStack {
-            Text(label)
-                .font(.subheadline)
-            Spacer()
-            Text(value)
-                .font(.subheadline)
-                .fontWeight(.medium)
-                .frame(width: 80, alignment: .trailing)
-            Text(rating)
-                .font(.caption)
-                .foregroundStyle(ratingColor)
-                .frame(width: 70, alignment: .trailing)
+        Button {
+            if metricKey != nil {
+                showHistory = true
+            }
+        } label: {
+            HStack {
+                Text(label)
+                    .font(.subheadline)
+                    .foregroundColor(.primary)
+                Spacer()
+                Text(value)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundColor(.primary)
+                    .frame(width: 80, alignment: .trailing)
+                Text(rating)
+                    .font(.caption)
+                    .foregroundStyle(ratingColor)
+                    .frame(width: 70, alignment: .trailing)
+                if metricKey != nil {
+                    Image(systemName: "chevron.right")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .sheet(isPresented: $showHistory) {
+            if let key = metricKey {
+                ScaleMetricHistoryView(metricLabel: label, metricKey: key, unit: unit)
+            }
         }
     }
 
@@ -365,6 +401,113 @@ struct ScaleMetricRow: View {
         case "Obese", "Very High", "Underweight": return .red
         default: return .secondary
         }
+    }
+}
+
+// MARK: - Metric History View
+
+struct ScaleMetricHistoryView: View {
+    let metricLabel: String
+    let metricKey: ScaleMetricKey
+    let unit: String
+    @StateObject private var store = ScaleHistoryStore.shared
+    @Environment(\.dismiss) private var dismiss
+    @State private var selectedPeriod: ScaleHistoryPeriod = .monthly
+
+    private var dataPoints: [(date: Date, value: Double)] {
+        metricKey.values(for: selectedPeriod, store: store)
+    }
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 16) {
+                // Period filter
+                HStack(spacing: 4) {
+                    ForEach(ScaleHistoryPeriod.allCases, id: \.self) { period in
+                        Button {
+                            selectedPeriod = period
+                        } label: {
+                            Text(period.rawValue)
+                                .font(.system(size: 13, weight: selectedPeriod == period ? .bold : .medium))
+                                .foregroundColor(selectedPeriod == period ? .white : .primary)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 8)
+                                .background(selectedPeriod == period ? Color.purple : Color(.systemGray5))
+                                .cornerRadius(8)
+                        }
+                    }
+                }
+                .padding(.horizontal)
+
+                if dataPoints.isEmpty {
+                    Spacer()
+                    VStack(spacing: 8) {
+                        Image(systemName: "chart.line.downtrend.xyaxis")
+                            .font(.system(size: 40))
+                            .foregroundStyle(.secondary)
+                        Text("No data for this period")
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                } else {
+                    // Chart
+                    Chart {
+                        ForEach(dataPoints, id: \.date) { point in
+                            LineMark(
+                                x: .value("Date", point.date),
+                                y: .value(metricLabel, point.value)
+                            )
+                            .interpolationMethod(.catmullRom)
+                            .foregroundStyle(Color.purple)
+
+                            PointMark(
+                                x: .value("Date", point.date),
+                                y: .value(metricLabel, point.value)
+                            )
+                            .foregroundStyle(Color.purple)
+                            .annotation(position: .top, spacing: 4) {
+                                Text(formatValue(point.value))
+                                    .font(.caption2.bold())
+                                    .foregroundStyle(.purple)
+                            }
+                        }
+                    }
+                    .chartYAxis {
+                        AxisMarks(position: .leading)
+                    }
+                    .frame(height: 220)
+                    .padding(.horizontal)
+
+                    // Entry list
+                    List {
+                        ForEach(dataPoints.reversed(), id: \.date) { point in
+                            HStack {
+                                Text(point.date.formatted(date: .abbreviated, time: .shortened))
+                                    .font(.subheadline)
+                                Spacer()
+                                Text("\(formatValue(point.value))\(unit.isEmpty ? "" : " \(unit)")")
+                                    .font(.subheadline.bold())
+                            }
+                        }
+                    }
+                    .listStyle(.plain)
+                }
+            }
+            .navigationTitle(metricLabel)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                }
+            }
+        }
+    }
+
+    private func formatValue(_ v: Double) -> String {
+        if v == v.rounded() && v < 1000 {
+            return String(format: "%.0f", v)
+        }
+        return String(format: "%.1f", v)
     }
 }
 

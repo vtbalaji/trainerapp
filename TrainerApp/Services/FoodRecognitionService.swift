@@ -1,9 +1,22 @@
 import Foundation
 import UIKit
+import CoreML
 import Vision
 
 class FoodRecognitionService {
     static let shared = FoodRecognitionService()
+
+    private var mlModel: VNCoreMLModel?
+
+    private init() {
+        do {
+            let config = MLModelConfiguration()
+            let foodModel = try IndianFood(configuration: config)
+            mlModel = try VNCoreMLModel(for: foodModel.model)
+        } catch {
+            print("Failed to load IndianFood model: \(error)")
+        }
+    }
 
     func recognizeFood(image: UIImage, completion: @escaping (Result<[RecognizedFood], Error>) -> Void) {
         guard let cgImage = image.cgImage else {
@@ -11,6 +24,89 @@ class FoodRecognitionService {
             return
         }
 
+        // Use our trained IndianFood model if available, else fall back to Vision
+        if let model = mlModel {
+            recognizeWithMLModel(model: model, cgImage: cgImage, completion: completion)
+        } else {
+            recognizeWithVision(cgImage: cgImage, completion: completion)
+        }
+    }
+
+    private func recognizeWithMLModel(model: VNCoreMLModel, cgImage: CGImage, completion: @escaping (Result<[RecognizedFood], Error>) -> Void) {
+        let request = VNCoreMLRequest(model: model) { request, error in
+            if let error = error {
+                DispatchQueue.main.async { completion(.failure(error)) }
+                return
+            }
+
+            guard let results = request.results as? [VNClassificationObservation] else {
+                DispatchQueue.main.async { completion(.success([])) }
+                return
+            }
+
+            // Get top prediction above threshold
+            let topPredictions = results
+                .filter { $0.confidence > 0.05 }
+                .prefix(5)
+
+            guard let top = topPredictions.first else {
+                DispatchQueue.main.async { completion(.success([])) }
+                return
+            }
+
+            var foods: [RecognizedFood] = []
+
+            // Only suggest if model is reasonably confident (>30%)
+            // Low confidence means the image doesn't match known dishes well
+            if top.confidence > 0.30 {
+                let primaryFood = Self.classToFoodName(top.identifier)
+
+                // Build combo suggestions based on primary food
+                let combos = MealCombos.suggestions(for: top.identifier)
+
+                // Add combo meals first
+                for combo in combos {
+                    foods.append(RecognizedFood(
+                        name: combo.displayName,
+                        confidence: Double(top.confidence),
+                        comboItems: combo.items
+                    ))
+                }
+
+                // Add single item as well
+                foods.append(RecognizedFood(
+                    name: primaryFood,
+                    confidence: Double(top.confidence),
+                    comboItems: nil
+                ))
+
+                // Add other top predictions as single items (>10% confidence)
+                for pred in topPredictions.dropFirst() where pred.confidence > 0.10 {
+                    foods.append(RecognizedFood(
+                        name: Self.classToFoodName(pred.identifier),
+                        confidence: Double(pred.confidence),
+                        comboItems: nil
+                    ))
+                }
+            }
+
+            DispatchQueue.main.async { completion(.success(foods)) }
+        }
+
+        request.imageCropAndScaleOption = .centerCrop
+
+        let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                try handler.perform([request])
+            } catch {
+                DispatchQueue.main.async { completion(.failure(error)) }
+            }
+        }
+    }
+
+    // Fallback: generic Vision classifier
+    private func recognizeWithVision(cgImage: CGImage, completion: @escaping (Result<[RecognizedFood], Error>) -> Void) {
         let request = VNClassifyImageRequest { request, error in
             if let error = error {
                 DispatchQueue.main.async { completion(.failure(error)) }
@@ -22,25 +118,12 @@ class FoodRecognitionService {
                 return
             }
 
-            // Filter for food-related labels with reasonable confidence
             let foodLabels = observations
                 .filter { $0.confidence > 0.05 && Self.isFoodRelated($0.identifier) }
-                .prefix(10)
-                .map { RecognizedFood(name: Self.cleanLabel($0.identifier), confidence: Double($0.confidence)) }
+                .prefix(5)
+                .map { RecognizedFood(name: Self.cleanLabel($0.identifier), confidence: Double($0.confidence), comboItems: nil) }
 
-            // Also try to match against our Indian food database
-            let dbMatches = Self.matchFoodDatabase(observations: observations)
-
-            // Combine: database matches first, then Vision labels
-            var combined: [RecognizedFood] = []
-            for match in dbMatches where !combined.contains(where: { $0.name.lowercased() == match.name.lowercased() }) {
-                combined.append(match)
-            }
-            for food in foodLabels where !combined.contains(where: { $0.name.lowercased() == food.name.lowercased() }) {
-                combined.append(food)
-            }
-
-            DispatchQueue.main.async { completion(.success(Array(combined.prefix(8)))) }
+            DispatchQueue.main.async { completion(.success(Array(foodLabels))) }
         }
 
         let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
@@ -53,39 +136,25 @@ class FoodRecognitionService {
         }
     }
 
-    // Food-related Vision classifier labels
+    /// Convert model class name (underscore) to display name
+    static func classToFoodName(_ className: String) -> String {
+        className.replacingOccurrences(of: "_", with: " ").capitalized
+    }
+
+    static func hasApiKey() -> Bool { true }
+
+    // MARK: - Vision fallback helpers
+
     private static let foodKeywords: Set<String> = [
-        "food", "fruit", "vegetable", "meat", "bread", "rice", "pasta", "pizza",
-        "sandwich", "salad", "soup", "cake", "cookie", "pie", "ice cream",
-        "chocolate", "candy", "cheese", "egg", "fish", "chicken", "beef",
-        "pork", "sushi", "burrito", "taco", "hot dog", "hamburger", "fries",
-        "potato", "tomato", "carrot", "broccoli", "corn", "banana", "apple",
-        "orange", "grape", "strawberry", "watermelon", "mango", "pineapple",
-        "lemon", "coconut", "avocado", "onion", "pepper", "mushroom",
-        "noodle", "dumpling", "curry", "stew", "roast", "grill", "fry",
-        "bake", "breakfast", "lunch", "dinner", "meal", "dish", "plate",
-        "bowl", "cup", "drink", "beverage", "juice", "milk", "coffee", "tea",
-        "wine", "beer", "water", "smoothie", "yogurt", "cereal", "oatmeal",
-        "pancake", "waffle", "donut", "muffin", "bagel", "pretzel",
-        "cracker", "chip", "nut", "seed", "bean", "lentil", "tofu",
-        "butter", "cream", "sauce", "dressing", "condiment", "spice",
-        "herb", "garlic", "ginger", "cinnamon", "honey", "sugar", "salt",
-        "flour", "dough", "batter", "confectionery", "produce", "grocery",
-        "snack", "dessert", "appetizer", "entree", "side dish",
-        // Indian food terms that Vision might recognize
-        "flatbread", "naan", "wrap", "stir fry", "fried rice", "biryani",
-        "dal", "paneer", "tikka", "masala", "samosa", "pakora", "chutney",
-        "raita", "lassi", "chai", "roti", "chapati", "dosa", "idli",
-        "guacamole", "hummus", "falafel", "kebab",
+        "food", "fruit", "vegetable", "meat", "bread", "rice", "pasta",
+        "sandwich", "salad", "soup", "cake", "cheese", "egg", "fish",
+        "chicken", "curry", "stew", "noodle", "dumpling", "dessert",
+        "pancake", "yogurt", "milk", "coffee", "tea", "banana", "mango",
     ]
 
     private static func isFoodRelated(_ identifier: String) -> Bool {
         let lower = identifier.lowercased().replacingOccurrences(of: "_", with: " ")
-        // Check if any food keyword appears in the identifier
-        for keyword in foodKeywords {
-            if lower.contains(keyword) { return true }
-        }
-        return false
+        return foodKeywords.contains(where: { lower.contains($0) })
     }
 
     private static func cleanLabel(_ identifier: String) -> String {
@@ -95,68 +164,16 @@ class FoodRecognitionService {
             .map { $0.prefix(1).uppercased() + $0.dropFirst().lowercased() }
             .joined(separator: " ")
     }
-
-    // Map Vision labels to our Indian food database entries
-    private static let visionToFoodDB: [String: [String]] = [
-        "rice": ["rice", "biryani"],
-        "bread": ["chapati", "roti", "naan", "paratha"],
-        "flatbread": ["chapati", "roti", "naan", "paratha"],
-        "naan": ["naan"],
-        "curry": ["chicken curry", "dal", "sambar", "rajma", "chole"],
-        "chicken": ["chicken curry", "butter chicken"],
-        "fish": ["fish curry"],
-        "egg": ["egg curry"],
-        "cheese": ["paneer", "palak paneer"],
-        "yogurt": ["raita", "lassi"],
-        "milk": ["lassi"],
-        "banana": ["banana"],
-        "mango": ["mango"],
-        "pancake": ["dosa"],
-        "dumpling": ["idli"],
-        "stew": ["sambar", "dal"],
-        "soup": ["sambar"],
-        "fried rice": ["biryani", "poha"],
-        "dessert": ["gulab jamun", "jalebi"],
-        "confectionery": ["gulab jamun", "jalebi"],
-        "candy": ["jalebi"],
-        "donut": ["gulab jamun"],
-        "fruit": ["mango", "banana", "papaya"],
-        "salad": ["raita"],
-        "bean": ["rajma", "chole", "dal"],
-        "lentil": ["dal", "sambar"],
-    ]
-
-    private static func matchFoodDatabase(observations: [VNClassificationObservation]) -> [RecognizedFood] {
-        var matches: [RecognizedFood] = []
-        let seen = NSMutableSet()
-
-        for obs in observations where obs.confidence > 0.03 {
-            let label = obs.identifier.lowercased().replacingOccurrences(of: "_", with: " ")
-            // Check direct database match
-            if IndianFoodDatabase.lookup(label) != nil && !seen.contains(label) {
-                matches.append(RecognizedFood(name: label.capitalized, confidence: Double(obs.confidence)))
-                seen.add(label)
-            }
-            // Check mapped matches
-            for (keyword, dbNames) in visionToFoodDB {
-                if label.contains(keyword) {
-                    for name in dbNames where !seen.contains(name) {
-                        matches.append(RecognizedFood(name: name.capitalized, confidence: Double(obs.confidence) * 0.8))
-                        seen.add(name)
-                    }
-                }
-            }
-        }
-
-        return matches.sorted { $0.confidence > $1.confidence }
-    }
-
-    static func hasApiKey() -> Bool { true } // No API key needed for on-device Vision
 }
+
+// MARK: - Models
 
 struct RecognizedFood {
     let name: String
     let confidence: Double
+    let comboItems: [MealComboItem]?
+
+    var isCombo: Bool { comboItems != nil }
 }
 
 enum FoodRecognitionError: LocalizedError {
@@ -167,6 +184,291 @@ enum FoodRecognitionError: LocalizedError {
         switch self {
         case .invalidImage: return "Could not process image"
         case .noData: return "No response from analysis"
+        }
+    }
+}
+
+// MARK: - Meal Combos
+
+struct MealComboItem {
+    let name: String         // food database lookup name
+    let servingSize: Double  // grams
+}
+
+struct MealCombo {
+    let displayName: String
+    let items: [MealComboItem]
+}
+
+enum MealCombos {
+    /// Return common meal combos for a detected food class
+    static func suggestions(for classLabel: String) -> [MealCombo] {
+        switch classLabel {
+        // South Indian Breakfast
+        case "idli":
+            return [
+                MealCombo(displayName: "Idli + Sambar + Chutney", items: [
+                    MealComboItem(name: "idli", servingSize: 120),
+                    MealComboItem(name: "sambar", servingSize: 100),
+                    MealComboItem(name: "coconut chutney", servingSize: 30),
+                ]),
+                MealCombo(displayName: "Idli + Vada + Sambar", items: [
+                    MealComboItem(name: "idli", servingSize: 120),
+                    MealComboItem(name: "vada", servingSize: 50),
+                    MealComboItem(name: "sambar", servingSize: 100),
+                ]),
+            ]
+        case "vada":
+            return [
+                MealCombo(displayName: "Vada + Sambar + Chutney", items: [
+                    MealComboItem(name: "vada", servingSize: 100),
+                    MealComboItem(name: "sambar", servingSize: 100),
+                    MealComboItem(name: "coconut chutney", servingSize: 30),
+                ]),
+                MealCombo(displayName: "Idli + Vada + Sambar", items: [
+                    MealComboItem(name: "idli", servingSize: 120),
+                    MealComboItem(name: "vada", servingSize: 50),
+                    MealComboItem(name: "sambar", servingSize: 100),
+                ]),
+            ]
+        case "masala_dosa", "set_dosa", "rava_dosa":
+            let dosaName = classLabel.replacingOccurrences(of: "_", with: " ")
+            return [
+                MealCombo(displayName: "\(dosaName.capitalized) + Sambar + Chutney", items: [
+                    MealComboItem(name: dosaName, servingSize: 120),
+                    MealComboItem(name: "sambar", servingSize: 100),
+                    MealComboItem(name: "coconut chutney", servingSize: 30),
+                ]),
+            ]
+        case "uttapam":
+            return [
+                MealCombo(displayName: "Uttapam + Sambar + Chutney", items: [
+                    MealComboItem(name: "uttapam", servingSize: 150),
+                    MealComboItem(name: "sambar", servingSize: 100),
+                    MealComboItem(name: "coconut chutney", servingSize: 30),
+                ]),
+            ]
+        case "pongal":
+            return [
+                MealCombo(displayName: "Pongal + Chutney + Sambar", items: [
+                    MealComboItem(name: "pongal", servingSize: 150),
+                    MealComboItem(name: "coconut chutney", servingSize: 30),
+                    MealComboItem(name: "sambar", servingSize: 100),
+                ]),
+            ]
+        case "upma":
+            return [
+                MealCombo(displayName: "Upma + Chutney", items: [
+                    MealComboItem(name: "upma", servingSize: 150),
+                    MealComboItem(name: "coconut chutney", servingSize: 30),
+                ]),
+            ]
+        case "poha":
+            return [
+                MealCombo(displayName: "Poha + Tea", items: [
+                    MealComboItem(name: "poha", servingSize: 150),
+                    MealComboItem(name: "tea", servingSize: 150),
+                ]),
+            ]
+        case "appam", "idiyappam", "puttu":
+            let name = classLabel.replacingOccurrences(of: "_", with: " ")
+            return [
+                MealCombo(displayName: "\(name.capitalized) + Curry", items: [
+                    MealComboItem(name: name, servingSize: 120),
+                    MealComboItem(name: "egg curry", servingSize: 100),
+                ]),
+            ]
+        case "paniyaram":
+            return [
+                MealCombo(displayName: "Paniyaram + Chutney", items: [
+                    MealComboItem(name: "paniyaram", servingSize: 100),
+                    MealComboItem(name: "coconut chutney", servingSize: 30),
+                ]),
+            ]
+
+        // South Indian Meals
+        case "sambar":
+            return [
+                MealCombo(displayName: "Rice + Sambar + Poriyal", items: [
+                    MealComboItem(name: "rice", servingSize: 200),
+                    MealComboItem(name: "sambar", servingSize: 150),
+                    MealComboItem(name: "poriyal", servingSize: 100),
+                ]),
+            ]
+        case "rasam":
+            return [
+                MealCombo(displayName: "Rice + Rasam + Poriyal + Curd", items: [
+                    MealComboItem(name: "rice", servingSize: 200),
+                    MealComboItem(name: "rasam", servingSize: 150),
+                    MealComboItem(name: "poriyal", servingSize: 80),
+                    MealComboItem(name: "curd", servingSize: 80),
+                ]),
+            ]
+        case "curd_rice":
+            return [
+                MealCombo(displayName: "Curd Rice", items: [
+                    MealComboItem(name: "curd rice", servingSize: 250),
+                ]),
+            ]
+        case "lemon_rice", "tamarind_rice":
+            let name = classLabel.replacingOccurrences(of: "_", with: " ")
+            return [
+                MealCombo(displayName: "\(name.capitalized) + Papad", items: [
+                    MealComboItem(name: name, servingSize: 200),
+                ]),
+            ]
+        case "bisibelebath":
+            return [
+                MealCombo(displayName: "Bisibelebath + Chips", items: [
+                    MealComboItem(name: "bisibelebath", servingSize: 250),
+                ]),
+            ]
+
+        // North Indian
+        case "chapati":
+            return [
+                MealCombo(displayName: "Chapati + Dal + Curd", items: [
+                    MealComboItem(name: "chapati", servingSize: 120),
+                    MealComboItem(name: "dal", servingSize: 150),
+                    MealComboItem(name: "curd", servingSize: 80),
+                ]),
+                MealCombo(displayName: "Chapati + Sabzi + Dal", items: [
+                    MealComboItem(name: "chapati", servingSize: 120),
+                    MealComboItem(name: "poriyal", servingSize: 100),
+                    MealComboItem(name: "dal", servingSize: 100),
+                ]),
+            ]
+        case "naan", "butter_naan":
+            return [
+                MealCombo(displayName: "Naan + Butter Chicken", items: [
+                    MealComboItem(name: "naan", servingSize: 100),
+                    MealComboItem(name: "butter chicken", servingSize: 150),
+                ]),
+                MealCombo(displayName: "Naan + Paneer + Dal", items: [
+                    MealComboItem(name: "naan", servingSize: 100),
+                    MealComboItem(name: "palak paneer", servingSize: 100),
+                    MealComboItem(name: "dal", servingSize: 100),
+                ]),
+            ]
+        case "dal":
+            return [
+                MealCombo(displayName: "Rice + Dal + Curd", items: [
+                    MealComboItem(name: "rice", servingSize: 200),
+                    MealComboItem(name: "dal", servingSize: 150),
+                    MealComboItem(name: "curd", servingSize: 80),
+                ]),
+            ]
+        case "chole", "chole_bhature":
+            return [
+                MealCombo(displayName: "Chole + Rice", items: [
+                    MealComboItem(name: "chole", servingSize: 150),
+                    MealComboItem(name: "rice", servingSize: 200),
+                ]),
+            ]
+        case "rajma":
+            return [
+                MealCombo(displayName: "Rajma + Rice", items: [
+                    MealComboItem(name: "rajma", servingSize: 150),
+                    MealComboItem(name: "rice", servingSize: 200),
+                ]),
+            ]
+        case "biryani":
+            return [
+                MealCombo(displayName: "Biryani + Raita", items: [
+                    MealComboItem(name: "biryani", servingSize: 250),
+                    MealComboItem(name: "raita", servingSize: 80),
+                ]),
+            ]
+        case "palak_paneer", "paneer":
+            return [
+                MealCombo(displayName: "Paneer + Roti + Dal", items: [
+                    MealComboItem(name: "palak paneer", servingSize: 100),
+                    MealComboItem(name: "chapati", servingSize: 120),
+                    MealComboItem(name: "dal", servingSize: 100),
+                ]),
+            ]
+        case "aloo_paratha":
+            return [
+                MealCombo(displayName: "Aloo Paratha + Curd + Pickle", items: [
+                    MealComboItem(name: "paratha", servingSize: 150),
+                    MealComboItem(name: "curd", servingSize: 80),
+                ]),
+            ]
+
+        // Non-veg
+        case "chicken_curry", "chicken_chettinad", "chicken_65", "chilli_chicken":
+            let name = classLabel.replacingOccurrences(of: "_", with: " ")
+            return [
+                MealCombo(displayName: "\(name.capitalized) + Rice", items: [
+                    MealComboItem(name: name, servingSize: 150),
+                    MealComboItem(name: "rice", servingSize: 200),
+                ]),
+            ]
+        case "fish_curry", "fish_fry":
+            let name = classLabel.replacingOccurrences(of: "_", with: " ")
+            return [
+                MealCombo(displayName: "\(name.capitalized) + Rice", items: [
+                    MealComboItem(name: name, servingSize: 150),
+                    MealComboItem(name: "rice", servingSize: 200),
+                ]),
+            ]
+        case "egg_curry":
+            return [
+                MealCombo(displayName: "Egg Curry + Rice", items: [
+                    MealComboItem(name: "egg curry", servingSize: 150),
+                    MealComboItem(name: "rice", servingSize: 200),
+                ]),
+                MealCombo(displayName: "Egg Curry + Chapati", items: [
+                    MealComboItem(name: "egg curry", servingSize: 150),
+                    MealComboItem(name: "chapati", servingSize: 120),
+                ]),
+            ]
+
+        // Snacks
+        case "samosa":
+            return [
+                MealCombo(displayName: "Samosa + Tea", items: [
+                    MealComboItem(name: "samosa", servingSize: 100),
+                    MealComboItem(name: "tea", servingSize: 150),
+                ]),
+            ]
+        case "pakora":
+            return [
+                MealCombo(displayName: "Pakora + Tea", items: [
+                    MealComboItem(name: "pakora", servingSize: 100),
+                    MealComboItem(name: "tea", servingSize: 150),
+                ]),
+            ]
+
+        // Beverages
+        case "tea":
+            return [
+                MealCombo(displayName: "Tea + Biscuit", items: [
+                    MealComboItem(name: "tea", servingSize: 150),
+                ]),
+            ]
+
+        // Thali — full meal plate
+        case "thali":
+            return [
+                MealCombo(displayName: "South Indian Thali", items: [
+                    MealComboItem(name: "rice", servingSize: 200),
+                    MealComboItem(name: "sambar", servingSize: 100),
+                    MealComboItem(name: "rasam", servingSize: 100),
+                    MealComboItem(name: "poriyal", servingSize: 80),
+                    MealComboItem(name: "curd", servingSize: 80),
+                ]),
+                MealCombo(displayName: "North Indian Thali", items: [
+                    MealComboItem(name: "chapati", servingSize: 120),
+                    MealComboItem(name: "dal", servingSize: 100),
+                    MealComboItem(name: "poriyal", servingSize: 80),
+                    MealComboItem(name: "rice", servingSize: 150),
+                    MealComboItem(name: "curd", servingSize: 80),
+                ]),
+            ]
+
+        default:
+            return []
         }
     }
 }

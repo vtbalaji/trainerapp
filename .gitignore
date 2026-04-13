@@ -20,3 +20,7 @@ Carthage/
 
 # Config with secrets
 TrainerApp/Config.swift
+
+# ML training data & large files
+FoodML/data/
+FoodML/results/*.pth

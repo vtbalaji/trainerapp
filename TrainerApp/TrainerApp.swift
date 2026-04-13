@@ -1,13 +1,13 @@
 import SwiftUI
 
 enum AppTab: String, CaseIterable {
+    case dietQuality = "Diet Quality"
     case workouts = "Workouts"
     case trainingPlan = "Training Plan"
     case dashboard = "Dashboard"
     case control = "Control"
     case history = "History"
     case scale = "Scale"
-    case dietQuality = "Diet Quality"
     case settings = "Settings"
 
     var icon: String {
@@ -28,7 +28,7 @@ enum AppTab: String, CaseIterable {
 struct TrainerApp: App {
     @StateObject private var bluetooth = BluetoothManager()
     @StateObject private var trainerStore = SavedTrainerStore()
-    @State private var selectedTab: AppTab = .workouts
+    @State private var selectedTab: AppTab = .dietQuality
     @State private var showMenu = false
 
     var body: some Scene {

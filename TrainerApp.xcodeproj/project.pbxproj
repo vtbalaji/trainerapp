@@ -64,6 +64,7 @@
 		A1000054 /* DietQualityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000054 /* DietQualityView.swift */; };
 		A1000055 /* DietQuality.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000055 /* DietQuality.swift */; };
 		A1000056 /* FoodRecognitionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000056 /* FoodRecognitionService.swift */; };
+		A1000070 /* IndianFood.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = B1000070 /* IndianFood.mlpackage */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -125,6 +126,7 @@
 		B1000054 /* DietQualityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DietQualityView.swift; sourceTree = "<group>"; };
 		B1000055 /* DietQuality.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DietQuality.swift; sourceTree = "<group>"; };
 		B1000056 /* FoodRecognitionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodRecognitionService.swift; sourceTree = "<group>"; };
+		B1000070 /* IndianFood.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = IndianFood.mlpackage; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -167,6 +169,7 @@
 				E1000005 /* Views */,
 				E1000006 /* Utilities */,
 				E1000008 /* Workouts */,
+				B1000070 /* IndianFood.mlpackage */,
 			);
 			path = TrainerApp;
 			sourceTree = "<group>";
@@ -378,6 +381,7 @@
 				A1000036 /* StravaAuthView.swift in Sources */,
 				A1000047 /* Config.swift in Sources */,
 				A1000056 /* FoodRecognitionService.swift in Sources */,
+				A1000070 /* IndianFood.mlpackage in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

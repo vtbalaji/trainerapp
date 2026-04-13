@@ -1,0 +1,503 @@
+{
+  "top1_accuracy": 0.8632262721039335,
+  "top3_accuracy": 0.9496571634788885,
+  "avg_inference_ms": 0.9056803167323042,
+  "per_class": {
+    "aloo_gobi": {
+      "top1": 0.7166666666666667,
+      "top3": 0.8666666666666667,
+      "count": 60
+    },
+    "aloo_mutter": {
+      "top1": 0.68,
+      "top3": 0.86,
+      "count": 50
+    },
+    "aloo_paratha": {
+      "top1": 0.7166666666666667,
+      "top3": 0.95,
+      "count": 60
+    },
+    "amritsari_kulcha": {
+      "top1": 0.86,
+      "top3": 0.96,
+      "count": 50
+    },
+    "appam": {
+      "top1": 0.9,
+      "top3": 0.94,
+      "count": 50
+    },
+    "avial": {
+      "top1": 0.9,
+      "top3": 0.98,
+      "count": 50
+    },
+    "balushahi": {
+      "top1": 0.94,
+      "top3": 1.0,
+      "count": 50
+    },
+    "bhindi_masala": {
+      "top1": 0.8688524590163934,
+      "top3": 0.9180327868852459,
+      "count": 61
+    },
+    "biryani": {
+      "top1": 0.5833333333333334,
+      "top3": 0.85,
+      "count": 60
+    },
+    "bisibelebath": {
+      "top1": 0.96,
+      "top3": 0.98,
+      "count": 50
+    },
+    "burger": {
+      "top1": 0.9,
+      "top3": 0.94,
+      "count": 50
+    },
+    "butter_naan": {
+      "top1": 0.82,
+      "top3": 0.96,
+      "count": 50
+    },
+    "buttermilk": {
+      "top1": 0.8333333333333334,
+      "top3": 0.9166666666666666,
+      "count": 60
+    },
+    "chapati": {
+      "top1": 0.8333333333333334,
+      "top3": 0.9166666666666666,
+      "count": 60
+    },
+    "chicken_65": {
+      "top1": 0.94,
+      "top3": 0.98,
+      "count": 50
+    },
+    "chicken_chettinad": {
+      "top1": 1.0,
+      "top3": 1.0,
+      "count": 50
+    },
+    "chicken_wings": {
+      "top1": 0.5333333333333333,
+      "top3": 0.9333333333333333,
+      "count": 60
+    },
+    "chilli_chicken": {
+      "top1": 0.44,
+      "top3": 0.92,
+      "count": 50
+    },
+    "chole": {
+      "top1": 0.6833333333333333,
+      "top3": 0.8333333333333334,
+      "count": 60
+    },
+    "chole_bhature": {
+      "top1": 0.9666666666666667,
+      "top3": 1.0,
+      "count": 60
+    },
+    "curd_rice": {
+      "top1": 0.96,
+      "top3": 0.98,
+      "count": 50
+    },
+    "dabeli": {
+      "top1": 0.9,
+      "top3": 0.9666666666666667,
+      "count": 60
+    },
+    "dal": {
+      "top1": 0.88,
+      "top3": 0.92,
+      "count": 50
+    },
+    "dal_khichdi": {
+      "top1": 0.9333333333333333,
+      "top3": 0.9833333333333333,
+      "count": 60
+    },
+    "dhokla": {
+      "top1": 0.8,
+      "top3": 0.9,
+      "count": 60
+    },
+    "egg_curry": {
+      "top1": 0.9,
+      "top3": 0.9333333333333333,
+      "count": 60
+    },
+    "falooda": {
+      "top1": 0.9333333333333333,
+      "top3": 1.0,
+      "count": 60
+    },
+    "fish_curry": {
+      "top1": 0.8333333333333334,
+      "top3": 0.9380952380952381,
+      "count": 210
+    },
+    "fish_fry": {
+      "top1": 0.9,
+      "top3": 1.0,
+      "count": 50
+    },
+    "fried_rice": {
+      "top1": 0.88,
+      "top3": 0.98,
+      "count": 50
+    },
+    "garlic_bread": {
+      "top1": 0.7833333333333333,
+      "top3": 0.8666666666666667,
+      "count": 60
+    },
+    "ghevar": {
+      "top1": 0.96,
+      "top3": 1.0,
+      "count": 50
+    },
+    "gujhia": {
+      "top1": 0.8,
+      "top3": 0.82,
+      "count": 50
+    },
+    "gulab_jamun": {
+      "top1": 0.9166666666666666,
+      "top3": 0.9666666666666667,
+      "count": 60
+    },
+    "halwa": {
+      "top1": 0.9916666666666667,
+      "top3": 0.9916666666666667,
+      "count": 120
+    },
+    "hara_bhara_kebab": {
+      "top1": 0.85,
+      "top3": 0.9666666666666667,
+      "count": 60
+    },
+    "idiyappam": {
+      "top1": 0.92,
+      "top3": 0.94,
+      "count": 50
+    },
+    "idli": {
+      "top1": 0.7833333333333333,
+      "top3": 0.8833333333333333,
+      "count": 60
+    },
+    "jalebi": {
+      "top1": 0.95,
+      "top3": 0.9833333333333333,
+      "count": 60
+    },
+    "kaathi_rolls": {
+      "top1": 0.98,
+      "top3": 0.98,
+      "count": 50
+    },
+    "kaju_katli": {
+      "top1": 1.0,
+      "top3": 1.0,
+      "count": 60
+    },
+    "kulfi": {
+      "top1": 0.7333333333333333,
+      "top3": 0.8666666666666667,
+      "count": 60
+    },
+    "ladoo": {
+      "top1": 0.9666666666666667,
+      "top3": 1.0,
+      "count": 60
+    },
+    "lemon_rice": {
+      "top1": 0.94,
+      "top3": 0.98,
+      "count": 50
+    },
+    "litti_chokha": {
+      "top1": 0.98,
+      "top3": 1.0,
+      "count": 50
+    },
+    "manchurian": {
+      "top1": 0.96,
+      "top3": 1.0,
+      "count": 50
+    },
+    "masala_dosa": {
+      "top1": 0.85,
+      "top3": 0.95,
+      "count": 60
+    },
+    "masala_papad": {
+      "top1": 0.9166666666666666,
+      "top3": 0.9666666666666667,
+      "count": 60
+    },
+    "methi_thepla": {
+      "top1": 0.94,
+      "top3": 0.98,
+      "count": 50
+    },
+    "misal_pav": {
+      "top1": 0.8333333333333334,
+      "top3": 0.9666666666666667,
+      "count": 60
+    },
+    "mixture": {
+      "top1": 0.72,
+      "top3": 0.8,
+      "count": 50
+    },
+    "modak": {
+      "top1": 0.95,
+      "top3": 0.95,
+      "count": 60
+    },
+    "momos": {
+      "top1": 0.9833333333333333,
+      "top3": 1.0,
+      "count": 60
+    },
+    "mysore_pak": {
+      "top1": 0.92,
+      "top3": 0.96,
+      "count": 50
+    },
+    "naan": {
+      "top1": 0.8166666666666667,
+      "top3": 0.9,
+      "count": 60
+    },
+    "navratan_korma": {
+      "top1": 0.8,
+      "top3": 0.86,
+      "count": 50
+    },
+    "pakora": {
+      "top1": 0.8166666666666667,
+      "top3": 0.9166666666666666,
+      "count": 60
+    },
+    "palak_paneer": {
+      "top1": 0.95,
+      "top3": 0.9666666666666667,
+      "count": 60
+    },
+    "paneer": {
+      "top1": 0.7454545454545455,
+      "top3": 0.9272727272727272,
+      "count": 110
+    },
+    "pani_puri": {
+      "top1": 0.8166666666666667,
+      "top3": 0.9,
+      "count": 60
+    },
+    "paniyaram": {
+      "top1": 0.94,
+      "top3": 1.0,
+      "count": 50
+    },
+    "papdi_chaat": {
+      "top1": 0.7833333333333333,
+      "top3": 0.9333333333333333,
+      "count": 60
+    },
+    "parotta": {
+      "top1": 1.0,
+      "top3": 1.0,
+      "count": 50
+    },
+    "pav_bhaji": {
+      "top1": 0.85,
+      "top3": 0.9666666666666667,
+      "count": 60
+    },
+    "payasam": {
+      "top1": 0.7818181818181819,
+      "top3": 0.9363636363636364,
+      "count": 110
+    },
+    "phirni": {
+      "top1": 0.68,
+      "top3": 0.88,
+      "count": 50
+    },
+    "pizza": {
+      "top1": 0.8666666666666667,
+      "top3": 0.95,
+      "count": 60
+    },
+    "poha": {
+      "top1": 0.7333333333333333,
+      "top3": 0.9833333333333333,
+      "count": 60
+    },
+    "pongal": {
+      "top1": 0.8679245283018868,
+      "top3": 0.9622641509433962,
+      "count": 53
+    },
+    "poori": {
+      "top1": 0.9473684210526315,
+      "top3": 1.0,
+      "count": 57
+    },
+    "puran_poli": {
+      "top1": 0.98,
+      "top3": 1.0,
+      "count": 50
+    },
+    "puttu": {
+      "top1": 0.98,
+      "top3": 1.0,
+      "count": 50
+    },
+    "rajma": {
+      "top1": 0.8833333333333333,
+      "top3": 0.9666666666666667,
+      "count": 60
+    },
+    "rasam": {
+      "top1": 0.98,
+      "top3": 1.0,
+      "count": 50
+    },
+    "rasgulla": {
+      "top1": 0.9666666666666667,
+      "top3": 1.0,
+      "count": 60
+    },
+    "rava_dosa": {
+      "top1": 0.9666666666666667,
+      "top3": 1.0,
+      "count": 60
+    },
+    "sabudana_khichdi": {
+      "top1": 0.66,
+      "top3": 0.88,
+      "count": 50
+    },
+    "sabudana_vada": {
+      "top1": 0.98,
+      "top3": 0.98,
+      "count": 50
+    },
+    "sambar": {
+      "top1": 0.98,
+      "top3": 1.0,
+      "count": 50
+    },
+    "samosa": {
+      "top1": 0.8,
+      "top3": 0.9,
+      "count": 60
+    },
+    "sandesh": {
+      "top1": 0.96,
+      "top3": 1.0,
+      "count": 50
+    },
+    "sandwich": {
+      "top1": 0.9,
+      "top3": 0.95,
+      "count": 60
+    },
+    "seekh_kebab": {
+      "top1": 0.7666666666666667,
+      "top3": 0.9,
+      "count": 60
+    },
+    "set_dosa": {
+      "top1": 0.9,
+      "top3": 0.9833333333333333,
+      "count": 60
+    },
+    "sev_puri": {
+      "top1": 0.8032786885245902,
+      "top3": 0.9016393442622951,
+      "count": 61
+    },
+    "tamarind_rice": {
+      "top1": 0.94,
+      "top3": 0.98,
+      "count": 50
+    },
+    "tea": {
+      "top1": 0.94,
+      "top3": 0.96,
+      "count": 50
+    },
+    "thali": {
+      "top1": 0.9333333333333333,
+      "top3": 0.95,
+      "count": 60
+    },
+    "thukpa": {
+      "top1": 0.8333333333333334,
+      "top3": 0.9666666666666667,
+      "count": 60
+    },
+    "unni_appam": {
+      "top1": 1.0,
+      "top3": 1.0,
+      "count": 50
+    },
+    "upma": {
+      "top1": 0.86,
+      "top3": 0.98,
+      "count": 50
+    },
+    "uttapam": {
+      "top1": 0.6666666666666666,
+      "top3": 0.9166666666666666,
+      "count": 60
+    },
+    "vada": {
+      "top1": 0.9833333333333333,
+      "top3": 0.9833333333333333,
+      "count": 60
+    },
+    "vada_pav": {
+      "top1": 0.7833333333333333,
+      "top3": 0.95,
+      "count": 60
+    }
+  },
+  "weak_classes": [
+    "chilli_chicken"
+  ],
+  "all_criteria_met": false,
+  "confusable_pairs": {
+    "idli_vs_appam": {
+      "idli_as_appam": 0,
+      "appam_as_idli": 1
+    },
+    "sambar_vs_rasam": {
+      "sambar_as_rasam": 0,
+      "rasam_as_sambar": 0
+    },
+    "gulab_jamun_vs_ladoo": {
+      "gulab_jamun_as_ladoo": 0,
+      "ladoo_as_gulab_jamun": 0
+    },
+    "pongal_vs_upma": {
+      "pongal_as_upma": 0,
+      "upma_as_pongal": 1
+    },
+    "biryani_vs_fried_rice": {
+      "biryani_as_fried_rice": 3,
+      "fried_rice_as_biryani": 2
+    }
+  }
+}

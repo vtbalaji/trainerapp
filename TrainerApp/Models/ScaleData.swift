@@ -1,6 +1,6 @@
 import Foundation
 
-struct SegmentData {
+struct SegmentData: Codable {
     var fatPercent: Double = 0    // % relative to ideal (80-120% is normal)
     var fatMass: Double = 0       // kg
     var musclePercent: Double = 0 // % relative to ideal (80-115% is normal)
@@ -8,7 +8,7 @@ struct SegmentData {
     var rating: String = "Standard"
 }
 
-struct ScaleData {
+struct ScaleData: Codable {
     var weight: Double = 0           // kg
     var bodyFat: Double = 0          // %
     var fatMass: Double = 0          // kg
@@ -379,5 +379,83 @@ struct ScaleData {
         
         result.timestamp = Date()
         return result
+    }
+}
+
+// MARK: - Scale History
+
+struct ScaleHistoryEntry: Codable, Identifiable {
+    var id: Date { timestamp }
+    let timestamp: Date
+    let data: ScaleData
+}
+
+enum ScaleHistoryPeriod: String, CaseIterable {
+    case daily = "Daily"
+    case weekly = "Weekly"
+    case monthly = "Monthly"
+    case yearly = "Yearly"
+}
+
+class ScaleHistoryStore: ObservableObject {
+    static let shared = ScaleHistoryStore()
+
+    @Published var entries: [ScaleHistoryEntry] = []
+
+    private let key = "scale_history_entries"
+
+    init() {
+        loadEntries()
+    }
+
+    func saveReading(_ data: ScaleData) {
+        guard data.hasData else { return }
+        // Avoid duplicate saves within 30 seconds
+        if let last = entries.last, let lastTs = last.data.timestamp, let newTs = data.timestamp,
+           newTs.timeIntervalSince(lastTs) < 30 {
+            return
+        }
+        let entry = ScaleHistoryEntry(timestamp: data.timestamp ?? Date(), data: data)
+        entries.append(entry)
+        persistEntries()
+    }
+
+    func entriesForPeriod(_ period: ScaleHistoryPeriod) -> [ScaleHistoryEntry] {
+        let cal = Calendar.current
+        let now = Date()
+        let cutoff: Date
+        switch period {
+        case .daily:
+            cutoff = cal.date(byAdding: .day, value: -1, to: now) ?? now
+        case .weekly:
+            cutoff = cal.date(byAdding: .day, value: -7, to: now) ?? now
+        case .monthly:
+            cutoff = cal.date(byAdding: .month, value: -1, to: now) ?? now
+        case .yearly:
+            cutoff = cal.date(byAdding: .year, value: -1, to: now) ?? now
+        }
+        let filtered = entries.filter { $0.timestamp >= cutoff }
+        // Return last 5 entries max
+        return Array(filtered.suffix(5))
+    }
+
+    func metricValues(_ period: ScaleHistoryPeriod, keyPath: KeyPath<ScaleData, Double>) -> [(date: Date, value: Double)] {
+        entriesForPeriod(period).map { ($0.timestamp, $0.data[keyPath: keyPath]) }
+    }
+
+    func metricValuesInt(_ period: ScaleHistoryPeriod, keyPath: KeyPath<ScaleData, Int>) -> [(date: Date, value: Double)] {
+        entriesForPeriod(period).map { ($0.timestamp, Double($0.data[keyPath: keyPath])) }
+    }
+
+    private func persistEntries() {
+        if let data = try? JSONEncoder().encode(entries) {
+            UserDefaults.standard.set(data, forKey: key)
+        }
+    }
+
+    private func loadEntries() {
+        guard let data = UserDefaults.standard.data(forKey: key),
+              let decoded = try? JSONDecoder().decode([ScaleHistoryEntry].self, from: data) else { return }
+        entries = decoded
     }
 }
